@@ -73,6 +73,7 @@
 
         .header {
             background: rgba(255,255,255,0.9);
+            -webkit-backdrop-filter: blur(20px);
             backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
@@ -266,6 +267,7 @@
             justify-content: center;
             padding: 1rem;
             background: rgba(255,255,255,0.15);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
             border-left: 1px solid rgba(255,255,255,0.2);
         }
@@ -318,6 +320,7 @@
             position: relative;
             z-index: 2;
             background: rgba(0,0,0,0.25);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
         }
 
@@ -338,6 +341,7 @@
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.5);
+            -webkit-backdrop-filter: blur(5px);
             backdrop-filter: blur(5px);
             display: none;
             align-items: flex-end;
@@ -838,6 +842,7 @@
 
         body.has-bg-image .detail-view {
             background: rgba(242, 242, 247, 0.95);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
 
@@ -856,6 +861,7 @@
 
         body.has-bg-image .detail-header {
             background: rgba(255, 255, 255, 0.9);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
 
@@ -1431,7 +1437,6 @@
         }
     </style>
 <base target="_blank">
-<base target="_blank">
 </head>
 <body>
     <header class="header">
@@ -1720,6 +1725,13 @@
                         <div class="privacy-text">
                             <strong id="privacyExportTitle">You Own Your Data</strong>
                             <span class="privacy-subtext" id="privacyExportText">Export and import your data anytime. Your information belongs to you.</span>
+                        </div>
+                    </div>
+                    <div class="privacy-item" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(52,199,89,0.2);">
+                        <div class="privacy-icon" style="background: #FF9500;">⚠️</div>
+                        <div class="privacy-text">
+                            <strong style="color: #FF9500;">Safari Users</strong>
+                            <span class="privacy-subtext">If using Safari Private Mode, your events won't be saved. Use normal browsing mode to save your data.</span>
                         </div>
                     </div>
                 </div>
@@ -2167,12 +2179,42 @@
             }
         };
 
-        let currentLang = localStorage.getItem('eventlist-language') || 'en';
+        // Safe localStorage wrapper for Safari private mode
+        function safeGetItem(key, defaultValue) {
+            if (!isLocalStorageAvailable()) return defaultValue;
+            try {
+                return localStorage.getItem(key) || defaultValue;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        
+        function safeSetItem(key, value) {
+            if (!isLocalStorageAvailable()) return false;
+            try {
+                localStorage.setItem(key, value);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        function safeRemoveItem(key) {
+            if (!isLocalStorageAvailable()) return false;
+            try {
+                localStorage.removeItem(key);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        let currentLang = safeGetItem('eventlist-language', 'en');
         let countdowns = [];
         let currentId = null;
         let liveCountdownInterval = null;
-        let autoSaveEnabled = localStorage.getItem('eventlist-autosave') === 'true';
-        let backgroundUrl = localStorage.getItem('eventlist-bg-url') || '';
+        let autoSaveEnabled = safeGetItem('eventlist-autosave', 'false') === 'true';
+        let backgroundUrl = safeGetItem('eventlist-bg-url', '');
 
         // ==================== UTILITY FUNCTIONS ====================
         function t(key) {
@@ -2238,12 +2280,27 @@
         });
 
         function loadData() {
+            if (!isLocalStorageAvailable()) {
+                console.warn('localStorage not available - using empty data');
+                countdowns = [];
+                
+                // Show warning for Safari private mode users
+                var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                if (isSafari) {
+                    setTimeout(function() {
+                        showToast('⚠️ Use normal browsing mode to save your events');
+                    }, 2000);
+                }
+                return;
+            }
+            
             try {
-                const saved = localStorage.getItem('countdowns');
+                const saved = safeGetItem('countdowns', null);
                 if (saved) {
                     countdowns = JSON.parse(saved);
                 }
             } catch (e) {
+                console.error('Failed to load from localStorage:', e);
                 countdowns = [];
             }
         }
@@ -2324,7 +2381,7 @@
 
         function changeLanguage(lang) {
             currentLang = lang;
-            localStorage.setItem('eventlist-language', lang);
+            safeSetItem('eventlist-language', lang);
             updateAllTranslations();
             renderCountdowns();
 
@@ -3198,7 +3255,7 @@
             const url = document.getElementById('bgUrlInput').value.trim();
             if (url) {
                 backgroundUrl = url;
-                localStorage.setItem('eventlist-bg-url', url);
+                safeSetItem('eventlist-bg-url', url);
                 applyBackground();
                 showToast('Background applied!');
             }
@@ -3206,7 +3263,7 @@
 
         function clearBackground() {
             backgroundUrl = '';
-            localStorage.removeItem('eventlist-bg-url');
+            safeRemoveItem('eventlist-bg-url');
             document.getElementById('bgUrlInput').value = '';
             document.getElementById('bgPreview').classList.remove('show');
             document.getElementById('bgClearBtn').style.display = 'none';
@@ -3306,7 +3363,7 @@
                         }
                         if (data.settings.backgroundUrl) {
                             backgroundUrl = data.settings.backgroundUrl;
-                            localStorage.setItem('eventlist-bg-url', backgroundUrl);
+                            safeSetItem('eventlist-bg-url', backgroundUrl);
                             document.getElementById('bgUrlInput').value = backgroundUrl;
                             updateBackgroundPreview();
                             applyBackground();
@@ -3328,14 +3385,36 @@
 
         function toggleAutoSave() {
             autoSaveEnabled = !autoSaveEnabled;
-            localStorage.setItem('eventlist-autosave', autoSaveEnabled);
+            safeSetItem('eventlist-autosave', autoSaveEnabled);
             document.getElementById('autoSaveToggle').classList.toggle('active', autoSaveEnabled);
             showToast(autoSaveEnabled ? 'Auto-save ON' : 'Auto-save OFF');
         }
 
         // ==================== STORAGE ====================
+        // Check if localStorage is available (Safari private mode blocks it)
+        function isLocalStorageAvailable() {
+            try {
+                var test = '__storage_test__';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
         function saveCountdowns() {
-            localStorage.setItem('countdowns', JSON.stringify(countdowns));
+            if (!isLocalStorageAvailable()) {
+                console.warn('localStorage not available - data will not persist after page refresh');
+                return;
+            }
+            
+            try {
+                safeSetItem('countdowns', JSON.stringify(countdowns));
+            } catch (e) {
+                console.error('Failed to save to localStorage:', e);
+                showToast('Warning: Could not save data. Storage may be full or unavailable.');
+            }
 
             if (autoSaveEnabled && countdowns.length > 0) {
                 var data = {version: 2, appName: 'EventList', savedAt: new Date().toISOString(), countdowns: countdowns};
