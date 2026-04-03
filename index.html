@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EventList">
+    
+    <title>EventList</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --ios-blue: #007AFF;
+            --ios-bg: #F2F2F7;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --border: #E5E5EA;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background-color: var(--ios-bg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #000;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Header (Image 1 Style) */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            padding-top: calc(15px + env(safe-area-inset-top));
+            background: rgba(255,255,255,0.7);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+
+        .header-btns { display: flex; gap: 12px; }
+        .icon-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            border: none; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 20px; transition: opacity 0.2s;
+        }
+        .icon-btn:active { opacity: 0.6; }
+        .btn-settings { background: #E5E5EA; color: #8E8E93; }
+        .btn-add { background: var(--ios-blue); color: white; }
+
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+
+        .section-label { 
+            font-size: 13px; font-weight: 600; color: #8E8E93; 
+            text-transform: uppercase; margin: 20px 0 10px 5px;
+        }
+
+        /* Event Card (Image 1) */
+        .event-card {
+            height: 110px;
+            border-radius: 22px;
+            margin-bottom: 15px;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: white;
+            cursor: pointer;
+        }
+
+        .event-card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 100%);
+            display: flex; width: 100%;
+        }
+
+        .card-left { flex: 1; padding: 15px; display: flex; align-items: center; gap: 12px; }
+        .card-icon-box {
+            width: 50px; height: 50px; border-radius: 12px;
+            background: rgba(255,255,255,0.2);
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        .card-icon-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .event-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+        .event-info p { font-size: 13px; opacity: 0.9; }
+
+        .card-right {
+            width: 100px; background: rgba(255,255,255,0.15);
+            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-left: 1px solid rgba(255,255,255,0.1);
+        }
+        .days-val { font-size: 32px; font-weight: 800; line-height: 1; }
+        .days-label { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+
+        /* Modals & Settings (Image 2 & 3) */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            z-index: 1000; display: none; align-items: flex-end;
+        }
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: #F2F2F7; width: 100%; max-width: 500px; margin: 0 auto;
+            border-radius: 30px 30px 0 0; padding: 20px;
+            max-height: 92vh; overflow-y: auto; padding-bottom: calc(40px + env(safe-area-inset-bottom));
+            -webkit-backdrop-filter: blur(25px); backdrop-filter: blur(25px);
+        }
+
+        .setting-box {
+            background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;
+        }
+
+        .setting-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-weight: 600; }
+        
+        .input-style {
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border);
+            background: #FAFAFA; font-size: 16px; outline: none; margin-bottom: 10px;
+        }
+
+        .btn-blue {
+            background: var(--ios-blue); color: white; border: none;
+            width: 100%; padding: 16px; border-radius: 14px; font-weight: 600; font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Detail View (Image 4 Style) */
+        #detailView { background: var(--ios-bg); z-index: 1100; }
+        .detail-hero {
+            height: 380px; position: relative; background-size: cover; background-position: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .detail-hero::after {
+            content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3); z-index: 1;
+        }
+        .detail-hero > * { z-index: 2; position: relative; }
+
+        .reminder-banner {
+            position: absolute; top: 60px; left: 20px; right: 20px;
+            background: rgba(255,255,255,0.9); padding: 12px 18px; border-radius: 18px;
+            display: flex; justify-content: space-between; align-items: center; color: #000;
+            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+        }
+
+        .detail-countdown-big { font-size: 90px; font-weight: 800; line-height: 1; margin-top: 10px; }
+
+        #toast {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); color: white; padding: 12px 24px;
+            border-radius: 25px; font-size: 14px; z-index: 2000; display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">EventList</div>
+        <div class="header-btns">
+            <button class="icon-btn btn-settings" onclick="openModal('settingsModal')">⚙️</button>
+            <button class="icon-btn btn-add" onclick="openModal('addModal')">+</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="section-label">Upcoming Events</div>
+        <div id="eventsList"></div>
+        <div style="text-align: center; color: #8E8E93; font-size: 12px; margin-top: 40px; margin-bottom: 20px;">
+            © 2026 H4ppyAsian
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal" onclick="if(event.target==this) closeModal('settingsModal')">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="font-size:26px; font-weight:700;">Settings</h2>
+                <button onclick="closeModal('settingsModal')" class="icon-btn" style="background:#E5E5EA;">✕</button>
+            </div>
+
+            <div class="setting-box">
+                <div class="setting-header">🖼️ App Background</div>
+                <input type="text" id="bgInput" class="input-style" placeholder="Paste image URL here...">
+                <button class="btn-blue" onclick="applyGlobalBg()">Apply Background</button>
+            </div>
+
+            <div class="setting-box">
+                <div class="setting-header">💾 Data Management</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <button class="btn-blue" style="background:#4285F4;" onclick="exportData()">Export</button>
+                    <button class="btn-blue" style="background:#5E5CE6;" onclick="document.getElementById('importFile').click()">Import</button>
+                </div>
+                <input type="file" id="importFile" hidden onchange="importData(this)">
+            </div>
+
+            <div class="setting-box">
+                <div class="setting-header">☕ Support</div>
+                <button class="btn-blue" style="background:#003087;" onclick="window.open('https://paypal.me/h4ppyasian')">Donate via PayPal</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal" onclick="if(event.target==this) closeModal('addModal')">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="font-size:24px; font-weight:700;">New Event</h2>
+                <button onclick="closeModal('addModal')" class="icon-btn" style="background:#E5E5EA;">✕</button>
+            </div>
+
+            <div class="setting-box">
+                <label class="section-label">Event Name</label>
+                <input type="text" id="evName" class="input-style" placeholder="Summer Vacation">
+                
+                <label class="section-label">Date</label>
+                <input type="date" id="evDate" class="input-style">
+
+                <label class="section-label">Event Background (URL)</label>
+                <input type="text" id="evImg" class="input-style" placeholder="https://image-url.com">
+            </div>
+            <button type="button" class="btn-blue" onclick="saveCountdown()">Save Event</button>
+        </div>
+    </div>
+
+    <div id="detailView" class="modal">
+        <div class="modal-content" style="padding:0; border-radius:0; height:100vh; max-height:100vh;">
+            <div id="dHero" class="detail-hero">
+                <div class="reminder-banner">
+                    <div>
+                        <div style="font-weight:700">🔔 Reminder Active</div>
+                        <div style="font-size:11px; color:#8E8E93">Notification set for 1 hour before</div>
+                    </div>
+                    <div style="width: 45px; height: 26px; background: #34C759; border-radius: 13px; display: flex; align-items: center; justify-content: flex-end; padding: 2px;">
+                        <div style="width: 22px; height: 22px; background: white; border-radius: 50%;"></div>
+                    </div>
+                </div>
+                
+                <button onclick="closeModal('detailView')" style="position:absolute; top:calc(60px + env(safe-area-inset-top)); right:20px; background:rgba(0,0,0,0.5); color:white; border:none; width:34px; height:34px; border-radius:50%; z-index:10;">✕</button>
+                
+                <div id="dIcon" class="card-icon-box" style="width:70px; height:70px; margin-bottom:15px; border:2px solid white;"></div>
+                <h1 id="dName" style="font-size:32px; font-weight:800;"></h1>
+                <p id="dDateFull" style="font-size:16px; opacity:0.8;"></p>
+                
+                <div id="dBigDays" class="detail-countdown-big"></div>
+                <p style="font-weight:700; text-transform:uppercase; letter-spacing:1px; font-size:14px;">days left</p>
+            </div>
+
+            <div class="container">
+                <div class="setting-box">
+                    <div class="setting-header">🗓️ Calendar Sync</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+                        <button class="btn-blue" style="background:#F2F2F7; color:#4285F4; font-size:13px; padding:10px;">Google</button>
+                        <button class="btn-blue" style="background:#F2F2F7; color:#4285F4; font-size:13px; padding:10px;">Outlook</button>
+                        <button class="btn-blue" style="background:#F2F2F7; color:#4285F4; font-size:13px; padding:10px;">iCal</button>
+                    </div>
+                </div>
+                
+                <button class="btn-blue" style="background:#FF3B30;" onclick="deleteCurrent()">Delete Event</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        let events = JSON.parse(localStorage.getItem('myEvents') || '[]');
+        let currentEditingId = null;
+
+        // SAFARI FIX: Direct save function without form submission reload
+        function saveCountdown() {
+            const name = document.getElementById('evName').value;
+            const date = document.getElementById('evDate').value;
+            const img = document.getElementById('evImg').value || 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=500';
+
+            if (!name || !date) {
+                showToast("Please enter a name and date");
+                return;
+            }
+
+            const newEv = {
+                id: Date.now(),
+                name: name,
+                date: date,
+                img: img
+            };
+
+            events.push(newEv);
+            localStorage.setItem('myEvents', JSON.stringify(events));
+            
+            closeModal('addModal');
+            document.getElementById('evName').value = '';
+            document.getElementById('evDate').value = '';
+            document.getElementById('evImg').value = '';
+            
+            renderList();
+            showToast("Event Saved!");
+        }
+
+        function renderList() {
+            const list = document.getElementById('eventsList');
+            list.innerHTML = '';
+
+            if (events.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:50px; color:#8E8E93;">No events yet. Tap + to add one!</div>';
+                return;
+            }
+
+            // Sort by date
+            events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            events.forEach(ev => {
+                const diff = new Date(ev.date) - new Date();
+                const days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+                const dateStr = new Date(ev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.style.backgroundImage = `url(${ev.img})`;
+                card.onclick = () => openDetail(ev.id);
+                
+                card.innerHTML = `
+                    <div class="event-card-overlay">
+                        <div class="card-left">
+                            <div class="card-icon-box"><img src="${ev.img}"></div>
+                            <div class="event-info">
+                                <h3>${ev.name}</h3>
+                                <p>${dateStr}</p>
+                            </div>
+                        </div>
+                        <div class="card-right">
+                            <div class="days-val">${days}</div>
+                            <div class="days-label">Days</div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function openDetail(id) {
+            const ev = events.find(x => x.id === id);
+            currentEditingId = id;
+            
+            document.getElementById('dHero').style.backgroundImage = `url(${ev.img})`;
+            document.getElementById('dName').innerText = ev.name;
+            document.getElementById('dDateFull').innerText = new Date(ev.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('dIcon').innerHTML = `<img src="${ev.img}">`;
+            
+            const diff = new Date(ev.date) - new Date();
+            document.getElementById('dBigDays').innerText = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+            
+            openModal('detailView');
+        }
+
+        function deleteCurrent() {
+            if(confirm("Delete this event?")) {
+                events = events.filter(x => x.id !== currentEditingId);
+                localStorage.setItem('myEvents', JSON.stringify(events));
+                closeModal('detailView');
+                renderList();
+            }
+        }
+
+        function applyGlobalBg() {
+            const url = document.getElementById('bgInput').value;
+            if(url) {
+                document.body.style.backgroundImage = `url(${url})`;
+                localStorage.setItem('globalBg', url);
+                showToast("Background Updated");
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(events));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "events_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imported = JSON.parse(e.target.result);
+                events = imported;
+                localStorage.setItem('myEvents', JSON.stringify(events));
+                renderList();
+                showToast("Data Imported!");
+            };
+            reader.readAsText(file);
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2500);
+        }
+
+        // Initialize App
+        window.onload = () => {
+            const savedBg = localStorage.getItem('globalBg');
+            if(savedBg) {
+                document.body.style.backgroundImage = `url(${savedBg})`;
+                document.getElementById('bgInput').value = savedBg;
+            }
+            renderList();
+        };
+    </script>
+</body>
+</html>
