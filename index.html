@@ -6,421 +6,3503 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="EventList">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="background-color" content="#F2F2F7">
+    <meta name="description" content="EventList - Your personal countdown and event reminder app">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="EventList">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167x167.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png">
+    <link rel="shortcut icon" href="icons/icon-192x192.png">
+    
+    <!-- Apple Splash Screens -->
+    <link rel="apple-touch-startup-image" href="icons/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="icons/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
     
     <title>EventList</title>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --ios-blue: #007AFF;
-            --ios-bg: #F2F2F7;
-            --card-bg: rgba(255, 255, 255, 0.8);
+            --bg: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --text: #1C1C1E;
+            --text-secondary: #8E8E93;
             --border: #E5E5EA;
+            --shadow: 0 2px 10px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --notification: #FF9500;
+            --primary: #007AFF;
+            --danger: #FF3B30;
+            --success: #34C759;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            background-color: var(--ios-bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 100px;
+            transition: background-image 0.3s ease;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: #000;
-            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Header (Image 1 Style) */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            padding-top: calc(15px + env(safe-area-inset-top));
-            background: rgba(255,255,255,0.7);
-            -webkit-backdrop-filter: blur(20px);
+        body.has-bg-image {
+            background-color: rgba(242, 242, 247, 0.85);
+            background-blend-mode: overlay;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.9);
             backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid var(--border);
         }
 
-        .logo { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-
-        .header-btns { display: flex; gap: 12px; }
-        .icon-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            border: none; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 20px; transition: opacity 0.2s;
-        }
-        .icon-btn:active { opacity: 0.6; }
-        .btn-settings { background: #E5E5EA; color: #8E8E93; }
-        .btn-add { background: var(--ios-blue); color: white; }
-
-        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-
-        .section-label { 
-            font-size: 13px; font-weight: 600; color: #8E8E93; 
-            text-transform: uppercase; margin: 20px 0 10px 5px;
-        }
-
-        /* Event Card (Image 1) */
-        .event-card {
-            height: 110px;
-            border-radius: 22px;
-            margin-bottom: 15px;
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem 1.25rem;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .settings-btn, .add-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .settings-btn {
+            background: var(--bg);
+        }
+
+        .add-btn {
+            background: var(--primary);
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .copyright {
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .section-header {
+            padding: 1.5rem 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .countdown-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .countdown-item {
+            display: flex;
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
             overflow: hidden;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .countdown-item:hover {
+            transform: translateX(4px);
+        }
+
+        .countdown-item.past {
+            opacity: 0.6;
+        }
+
+        .countdown-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            min-height: 80px;
+        }
+
+        .countdown-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            flex-shrink: 0;
             position: relative;
+            overflow: hidden;
+        }
+
+        .countdown-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .notification-indicator {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            background: var(--notification);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            border: 2px solid white;
+        }
+
+        .countdown-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .countdown-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .countdown-date {
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 2;
+        }
+
+        .countdown-location {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.85);
+            margin-top: 0.2rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 2;
+        }
+
+        .live-countdown {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.9);
+            margin-top: 0.25rem;
+            font-family: 'SF Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 2;
+        }
+
+        .countdown-days {
+            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .days-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .days-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.9);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Gradient scrim overlay for image backgrounds */
+        .countdown-item.has-image {
+            position: relative;
+        }
+
+        .countdown-item.has-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.15) 70%, transparent 100%);
+            z-index: 1;
+            border-radius: var(--radius-lg);
+            pointer-events: none;
+        }
+
+        .countdown-item.has-image .countdown-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .countdown-item.has-image .countdown-days {
+            position: relative;
+            z-index: 2;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(8px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            z-index: 10;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--bg);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        /* Notification Section */
+        .notification-section {
+            background: linear-gradient(135deg, rgba(255,149,0,0.08) 0%, rgba(255,107,53,0.08) 100%);
+            border: 1px solid rgba(255,149,0,0.2);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .notification-icon-big {
+            width: 40px;
+            height: 40px;
+            background: var(--notification);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .notification-title-text {
+            font-weight: 600;
+        }
+
+        .notification-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .notification-options {
+            display: none;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .notification-options.show {
+            display: flex;
+        }
+
+        .time-chip {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .time-chip input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .time-chip-label {
+            display: block;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .time-chip input:checked + .time-chip-label {
+            border-color: var(--notification);
+            background: rgba(255,149,0,0.1);
+            color: var(--notification);
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            width: 51px;
+            height: 31px;
+            background: var(--border);
+            border-radius: 15.5px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle.active {
+            background: var(--success);
+        }
+
+        .toggle-knob {
+            width: 27px;
+            height: 27px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle.active .toggle-knob {
+            transform: translateX(20px);
+        }
+
+        /* Color Grid */
+        .color-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .background-type-options {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .bg-type-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .bg-type-btn.active {
+            border-color: var(--primary);
+            background: rgba(0,122,255,0.1);
+            color: var(--primary);
+        }
+
+        .bg-image-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg);
+            position: relative;
+        }
+
+        .bg-image-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(0,122,255,0.05);
+        }
+
+        .bg-upload-preview {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: none;
+            margin: 0 auto;
+        }
+
+        .bg-upload-placeholder {
+            pointer-events: none;
+        }
+
+        .has-bg-image .bg-upload-preview {
+            display: block;
+        }
+
+        .has-bg-image .bg-upload-placeholder {
+            display: none;
+        }
+
+        .remove-bg-image-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .has-bg-image .remove-bg-image-btn {
+            display: flex;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .color-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .color-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .color-circle {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .color-option input:checked + .color-circle {
+            border-color: var(--text);
+            transform: scale(1.1);
+        }
+
+        .color-option input:checked + .color-circle::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Icon Section */
+        .icon-section {
+            margin-bottom: 1.25rem;
+        }
+
+        .icon-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .icon-option {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg);
+        }
+
+        .icon-option.active {
+            border-color: var(--primary);
+            background: rgba(0,122,255,0.1);
+        }
+
+        .icon-option-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .icon-option-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .emoji-picker {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: var(--radius);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .emoji-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .emoji-btn:hover, .emoji-btn.selected {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Image Upload */
+        .image-upload-wrapper {
+            margin-top: 0.5rem;
+        }
+
+        .image-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg);
+            position: relative;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(0,122,255,0.05);
+        }
+
+        .upload-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .upload-placeholder {
+            pointer-events: none;
+        }
+
+        .has-image .upload-preview {
+            display: block;
+        }
+
+        .has-image .upload-placeholder {
+            display: none;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .has-image .remove-image-btn {
+            display: flex;
+        }
+
+        .submit-btn, .delete-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            display: none;
+        }
+
+        /* Detail View */
+        .detail-view {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        body.has-bg-image .detail-view {
+            background: rgba(242, 242, 247, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .detail-view.active {
+            display: flex;
+        }
+
+        .detail-header {
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        body.has-bg-image .detail-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .detail-content {
+            flex: 1;
+            padding: 1.5rem;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        body.has-bg-image .detail-card {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .detail-card.has-image-bg {
             background-size: cover;
             background-position: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             color: white;
+            position: relative;
+        }
+
+        .detail-card.has-image-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%);
+            z-index: 1;
+            border-radius: var(--radius-lg);
+            pointer-events: none;
+        }
+
+        .detail-card.has-image-bg > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .detail-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            overflow: hidden;
+        }
+
+        .detail-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .detail-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-date {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .detail-countdown-big {
+            font-size: 5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .detail-countdown-label {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .live-countdown-detail {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 1rem;
+            font-family: 'SF Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Calendar Section */
+        .calendar-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        body.has-bg-image .calendar-section {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .calendar-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .calendar-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .calendar-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Todo Section */
+        .todo-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        body.has-bg-image .todo-section {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .todo-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .todo-input-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .todo-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+        }
+
+        .todo-add-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius);
+            font-size: 1.5rem;
             cursor: pointer;
         }
 
-        .event-card-overlay {
-            position: absolute; inset: 0;
-            background: linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 100%);
-            display: flex; width: 100%;
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
-        .card-left { flex: 1; padding: 15px; display: flex; align-items: center; gap: 12px; }
-        .card-icon-box {
-            width: 50px; height: 50px; border-radius: 12px;
-            background: rgba(255,255,255,0.2);
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-        }
-        .card-icon-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        .event-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
-        .event-info p { font-size: 13px; opacity: 0.9; }
-
-        .card-right {
-            width: 100px; background: rgba(255,255,255,0.15);
-            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-left: 1px solid rgba(255,255,255,0.1);
-        }
-        .days-val { font-size: 32px; font-weight: 800; line-height: 1; }
-        .days-label { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
-
-        /* Modals & Settings (Image 2 & 3) */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-            z-index: 1000; display: none; align-items: flex-end;
-        }
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: #F2F2F7; width: 100%; max-width: 500px; margin: 0 auto;
-            border-radius: 30px 30px 0 0; padding: 20px;
-            max-height: 92vh; overflow-y: auto; padding-bottom: calc(40px + env(safe-area-inset-bottom));
-            -webkit-backdrop-filter: blur(25px); backdrop-filter: blur(25px);
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
         }
 
-        .setting-box {
-            background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;
+        .todo-item.completed {
+            opacity: 0.6;
         }
 
-        .setting-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-weight: 600; }
-        
-        .input-style {
-            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border);
-            background: #FAFAFA; font-size: 16px; outline: none; margin-bottom: 10px;
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
         }
 
-        .btn-blue {
-            background: var(--ios-blue); color: white; border: none;
-            width: 100%; padding: 16px; border-radius: 14px; font-weight: 600; font-size: 16px;
+        .todo-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
         }
 
-        /* Detail View (Image 4 Style) */
-        #detailView { background: var(--ios-bg); z-index: 1100; }
-        .detail-hero {
-            height: 380px; position: relative; background-size: cover; background-position: center;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        .detail-hero::after {
-            content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3); z-index: 1;
-        }
-        .detail-hero > * { z-index: 2; position: relative; }
-
-        .reminder-banner {
-            position: absolute; top: 60px; left: 20px; right: 20px;
-            background: rgba(255,255,255,0.9); padding: 12px 18px; border-radius: 18px;
-            display: flex; justify-content: space-between; align-items: center; color: #000;
-            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+        .todo-checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
         }
 
-        .detail-countdown-big { font-size: 90px; font-weight: 800; line-height: 1; margin-top: 10px; }
+        .todo-text {
+            flex: 1;
+            font-size: 0.95rem;
+        }
 
-        #toast {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.85); color: white; padding: 12px 24px;
-            border-radius: 25px; font-size: 14px; z-index: 2000; display: none;
+        .todo-delete {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .todo-empty {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Notification Status Card */
+        .notification-status-card {
+            background: linear-gradient(135deg, rgba(255,149,0,0.1) 0%, rgba(255,107,53,0.1) 100%);
+            border: 1px solid rgba(255,149,0,0.2);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .notification-status-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--notification);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .notification-status-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .notification-status-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-status-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 3000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Settings Sections */
+        .bg-url-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(0,122,255,0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(0,122,255,0.2);
+        }
+
+        .bg-url-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            font-family: inherit;
+        }
+
+        .bg-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            background-size: cover;
+            background-position: center;
+            display: none;
+        }
+
+        .bg-preview.show {
+            display: block;
+        }
+
+        .bg-clear-btn {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .settings-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
+        }
+
+        .settings-section-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .settings-row-text {
+            flex: 1;
+        }
+
+        .settings-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .language-select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            font-family: inherit;
+            margin-top: 0.5rem;
+        }
+
+        .settings-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .home-screen-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(52,199,89,0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(52,199,89,0.2);
+        }
+
+        .home-screen-guide {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .footer-info {
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .button-row .submit-btn {
+            flex: 1;
+            margin-top: 0;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .button-row .submit-btn.secondary {
+            background: #5856D6;
+        }
+
+        /* Privacy & Trust Section */
+        .privacy-section {
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(52,199,89,0.08) 0%, rgba(48,209,88,0.08) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(52,199,89,0.2);
+        }
+
+        .privacy-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            color: #34C759;
+        }
+
+        .privacy-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .privacy-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .privacy-icon {
+            width: 24px;
+            height: 24px;
+            background: #34C759;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .privacy-text {
+            line-height: 1.4;
+        }
+
+        .privacy-text strong {
+            display: block;
+            margin-bottom: 0.1rem;
+        }
+
+        .privacy-subtext {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Donation Section */
+        .donation-section {
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(0,122,255,0.1) 0%, rgba(0,200,190,0.1) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(0,122,255,0.2);
+            text-align: center;
+        }
+
+        .donation-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .donation-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .donation-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, #0070BA 0%, #005EA6 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,112,186,0.3);
+        }
+
+        .donation-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,112,186,0.4);
+        }
+
+        .donation-btn:active {
+            transform: translateY(0);
+        }
+
+        .donation-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .donation-heart {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
     </style>
+<base target="_blank">
+<base target="_blank">
 </head>
 <body>
-
-    <header class="app-header">
-        <div class="logo">EventList</div>
-        <div class="header-btns">
-            <button class="icon-btn btn-settings" onclick="openModal('settingsModal')">⚙️</button>
-            <button class="icon-btn btn-add" onclick="openModal('addModal')">+</button>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo" id="appLogo">EventList</div>
+            <div class="header-actions">
+                <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
+                <button class="add-btn" onclick="openModal()" title="Add Event">+</button>
+            </div>
         </div>
     </header>
 
-    <div class="container">
-        <div class="section-label">Upcoming Events</div>
-        <div id="eventsList"></div>
-        <div style="text-align: center; color: #8E8E93; font-size: 12px; margin-top: 40px; margin-bottom: 20px;">
-            © 2026 H4ppyAsian
-        </div>
-    </div>
+    <div class="copyright">© 2026 H4ppyAsian</div>
 
-    <div id="settingsModal" class="modal" onclick="if(event.target==this) closeModal('settingsModal')">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="font-size:26px; font-weight:700;">Settings</h2>
-                <button onclick="closeModal('settingsModal')" class="icon-btn" style="background:#E5E5EA;">✕</button>
-            </div>
-
-            <div class="setting-box">
-                <div class="setting-header">🖼️ App Background</div>
-                <input type="text" id="bgInput" class="input-style" placeholder="Paste image URL here...">
-                <button class="btn-blue" onclick="applyGlobalBg()">Apply Background</button>
-            </div>
-
-            <div class="setting-box">
-                <div class="setting-header">💾 Data Management</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button class="btn-blue" style="background:#4285F4;" onclick="exportData()">Export</button>
-                    <button class="btn-blue" style="background:#5E5CE6;" onclick="document.getElementById('importFile').click()">Import</button>
-                </div>
-                <input type="file" id="importFile" hidden onchange="importData(this)">
-            </div>
-
-            <div class="setting-box">
-                <div class="setting-header">☕ Support</div>
-                <button class="btn-blue" style="background:#003087;" onclick="window.open('https://paypal.me/h4ppyasian')">Donate via PayPal</button>
+    <main class="container">
+        <div class="section-header" id="upcomingHeader">Upcoming</div>
+        <div id="upcomingList" class="countdown-list">
+            <div class="empty-state">
+                <div class="empty-icon">📅</div>
+                <p id="emptyText">No countdowns yet. Tap + to create one!</p>
             </div>
         </div>
-    </div>
 
-    <div id="addModal" class="modal" onclick="if(event.target==this) closeModal('addModal')">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="font-size:24px; font-weight:700;">New Event</h2>
-                <button onclick="closeModal('addModal')" class="icon-btn" style="background:#E5E5EA;">✕</button>
+        <div class="section-header" id="pastHeader" style="display: none;">Past</div>
+        <div id="pastList" class="countdown-list"></div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">New Countdown</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
             </div>
+            <div class="modal-body">
+                <form id="countdownForm" onsubmit="handleSubmit(event)">
+                    <input type="hidden" id="editId">
 
-            <div class="setting-box">
-                <label class="section-label">Event Name</label>
-                <input type="text" id="evName" class="input-style" placeholder="Summer Vacation">
-                
-                <label class="section-label">Date</label>
-                <input type="date" id="evDate" class="input-style">
-
-                <label class="section-label">Event Background (URL)</label>
-                <input type="text" id="evImg" class="input-style" placeholder="https://image-url.com">
-            </div>
-            <button type="button" class="btn-blue" onclick="saveCountdown()">Save Event</button>
-        </div>
-    </div>
-
-    <div id="detailView" class="modal">
-        <div class="modal-content" style="padding:0; border-radius:0; height:100vh; max-height:100vh;">
-            <div id="dHero" class="detail-hero">
-                <div class="reminder-banner">
-                    <div>
-                        <div style="font-weight:700">🔔 Reminder Active</div>
-                        <div style="font-size:11px; color:#8E8E93">Notification set for 1 hour before</div>
+                    <div class="form-group">
+                        <label class="form-label" id="eventNameLabel">Event Name *</label>
+                        <input type="text" class="form-input" id="eventName" placeholder="e.g., Anniversary" required>
                     </div>
-                    <div style="width: 45px; height: 26px; background: #34C759; border-radius: 13px; display: flex; align-items: center; justify-content: flex-end; padding: 2px;">
-                        <div style="width: 22px; height: 22px; background: white; border-radius: 50%;"></div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="eventDateLabel">Date *</label>
+                        <input type="date" class="form-input" id="eventDate" required>
                     </div>
-                </div>
-                
-                <button onclick="closeModal('detailView')" style="position:absolute; top:calc(60px + env(safe-area-inset-top)); right:20px; background:rgba(0,0,0,0.5); color:white; border:none; width:34px; height:34px; border-radius:50%; z-index:10;">✕</button>
-                
-                <div id="dIcon" class="card-icon-box" style="width:70px; height:70px; margin-bottom:15px; border:2px solid white;"></div>
-                <h1 id="dName" style="font-size:32px; font-weight:800;"></h1>
-                <p id="dDateFull" style="font-size:16px; opacity:0.8;"></p>
-                
-                <div id="dBigDays" class="detail-countdown-big"></div>
-                <p style="font-weight:700; text-transform:uppercase; letter-spacing:1px; font-size:14px;">days left</p>
-            </div>
 
-            <div class="container">
-                <div class="setting-box">
-                    <div class="setting-header">🗓️ Calendar Sync</div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
-                        <button class="btn-blue" style="background:#F2F2F7; color:#4285F4; font-size:13px; padding:10px;">Google</button>
-                        <button class="btn-blue" style="background:#F2F2F7; color:#4285F4; font-size:13px; padding:10px;">Outlook</button>
-                        <button class="btn-blue" style="background:#F2F2F7; color:#4285F4; font-size:13px; padding:10px;">iCal</button>
+                    <div class="form-group">
+                        <label class="form-label" id="eventTimeLabel">Time (Optional)</label>
+                        <input type="time" class="form-input" id="eventTime">
                     </div>
-                </div>
-                
-                <button class="btn-blue" style="background:#FF3B30;" onclick="deleteCurrent()">Delete Event</button>
-            </div>
-        </div>
-    </div>
 
-    <div id="toast"></div>
+                    <div class="form-group">
+                        <label class="form-label" id="eventLocationLabel">Location (Optional)</label>
+                        <input type="text" class="form-input" id="eventLocation" placeholder="e.g., Central Park, New York">
+                    </div>
 
-    <script>
-        let events = JSON.parse(localStorage.getItem('myEvents') || '[]');
-        let currentEditingId = null;
-
-        // SAFARI FIX: Direct save function without form submission reload
-        function saveCountdown() {
-            const name = document.getElementById('evName').value;
-            const date = document.getElementById('evDate').value;
-            const img = document.getElementById('evImg').value || 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=500';
-
-            if (!name || !date) {
-                showToast("Please enter a name and date");
-                return;
-            }
-
-            const newEv = {
-                id: Date.now(),
-                name: name,
-                date: date,
-                img: img
-            };
-
-            events.push(newEv);
-            localStorage.setItem('myEvents', JSON.stringify(events));
-            
-            closeModal('addModal');
-            document.getElementById('evName').value = '';
-            document.getElementById('evDate').value = '';
-            document.getElementById('evImg').value = '';
-            
-            renderList();
-            showToast("Event Saved!");
-        }
-
-        function renderList() {
-            const list = document.getElementById('eventsList');
-            list.innerHTML = '';
-
-            if (events.length === 0) {
-                list.innerHTML = '<div style="text-align:center; padding:50px; color:#8E8E93;">No events yet. Tap + to add one!</div>';
-                return;
-            }
-
-            // Sort by date
-            events.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            events.forEach(ev => {
-                const diff = new Date(ev.date) - new Date();
-                const days = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-                const dateStr = new Date(ev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                
-                const card = document.createElement('div');
-                card.className = 'event-card';
-                card.style.backgroundImage = `url(${ev.img})`;
-                card.onclick = () => openDetail(ev.id);
-                
-                card.innerHTML = `
-                    <div class="event-card-overlay">
-                        <div class="card-left">
-                            <div class="card-icon-box"><img src="${ev.img}"></div>
-                            <div class="event-info">
-                                <h3>${ev.name}</h3>
-                                <p>${dateStr}</p>
+                    <div class="notification-section">
+                        <div class="notification-header">
+                            <div class="notification-icon-big">🔔</div>
+                            <div>
+                                <div class="notification-title-text" id="remindMeTitle">Remind Me</div>
+                                <div class="notification-subtitle" id="remindMeSubtitle">Get notified before event starts</div>
                             </div>
                         </div>
-                        <div class="card-right">
-                            <div class="days-val">${days}</div>
-                            <div class="days-label">Days</div>
+
+                        <div class="notification-toggle-row">
+                            <span style="font-weight: 500;" id="enableNotificationText">Enable Notification</span>
+                            <div class="toggle" id="notificationToggle" onclick="toggleNotification()">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+
+                        <div class="notification-options" id="notificationOptions">
+                            <label class="time-chip">
+                                <input type="radio" name="notifyTime" value="15">
+                                <span class="time-chip-label">15 min</span>
+                            </label>
+                            <label class="time-chip">
+                                <input type="radio" name="notifyTime" value="30">
+                                <span class="time-chip-label">30 min</span>
+                            </label>
+                            <label class="time-chip">
+                                <input type="radio" name="notifyTime" value="60" checked>
+                                <span class="time-chip-label">1 hour</span>
+                            </label>
+                            <label class="time-chip">
+                                <input type="radio" name="notifyTime" value="1440">
+                                <span class="time-chip-label">1 day</span>
+                            </label>
+                            <label class="time-chip">
+                                <input type="radio" name="notifyTime" value="2880">
+                                <span class="time-chip-label">2 days</span>
+                            </label>
                         </div>
                     </div>
-                `;
-                list.appendChild(card);
-            });
+
+                    <div class="icon-section">
+                        <label class="form-label" id="chooseIconLabel">Choose Icon</label>
+                        <div class="icon-options">
+                            <div class="icon-option active" onclick="selectIconType('emoji')" id="emojiOption">
+                                <div class="icon-option-emoji">😊</div>
+                                <div class="icon-option-label" id="emojiLabel">Emoji</div>
+                            </div>
+                            <div class="icon-option" onclick="selectIconType('image')" id="imageOption">
+                                <div class="icon-option-emoji">📷</div>
+                                <div class="icon-option-label" id="photoLabel">Photo</div>
+                            </div>
+                        </div>
+
+                        <div id="emojiPicker" class="emoji-picker">
+                            <button type="button" class="emoji-btn selected" onclick="selectEmoji('❤️', this)">❤️</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🎂', this)">🎂</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('✈️', this)">✈️</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🎄', this)">🎄</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🎉', this)">🎉</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('💍', this)">💍</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🏖️', this)">🏖️</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🎁', this)">🎁</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🏠', this)">🏠</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🚗', this)">🚗</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('✂️', this)">✂️</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🏃', this)">🏃</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🎓', this)">🎓</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('👶', this)">👶</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🐕', this)">🐕</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🌸', this)">🌸</button>
+                        </div>
+
+                        <div class="image-upload-wrapper" id="imageUploadWrapper" style="display: none;">
+                            <input type="file" id="imageInput" accept="image/*" style="display: none" onchange="handleImageUpload(this)">
+                            <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('imageInput').click()">
+                                <img class="upload-preview" id="uploadPreview" alt="Preview">
+                                <div class="upload-placeholder">
+                                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📷</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="tapToChoose">Tap to choose photo</div>
+                                </div>
+                                <button type="button" class="remove-image-btn" onclick="removeImage(event)">×</button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="selectedEmoji" value="❤️">
+                        <input type="hidden" id="imageData" value="">
+                    </div>
+
+                    <div class="color-section">
+                        <label class="form-label" id="bgColorLabel">Background</label>
+                        <div class="background-type-options" style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button type="button" class="bg-type-btn active" onclick="selectBgType('color')" id="bgTypeColor">🎨 Color</button>
+                            <button type="button" class="bg-type-btn" onclick="selectBgType('image')" id="bgTypeImage">📷 Image</button>
+                            <button type="button" class="bg-type-btn" onclick="selectBgType('url')" id="bgTypeUrl">🌐 URL</button>
+                        </div>
+
+                        <div id="colorPickerSection">
+                            <div class="color-grid" id="colorGrid"></div>
+                        </div>
+
+                        <div id="imageUploadSection" style="display: none;">
+                            <input type="file" id="bgImageInput" accept="image/*" style="display: none" onchange="handleBgImageUpload(this)">
+                            <div class="bg-image-upload-area" id="bgImageUploadArea" onclick="document.getElementById('bgImageInput').click()">
+                                <img class="bg-upload-preview" id="bgUploadPreview" alt="Background Preview">
+                                <div class="bg-upload-placeholder">
+                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📷</div>
+                                    <div style="color: var(--text-secondary); font-size: 0.9rem;" id="tapToUploadBg">Tap to upload background image</div>
+                                </div>
+                                <button type="button" class="remove-bg-image-btn" onclick="removeBgImage(event)">×</button>
+                            </div>
+                        </div>
+
+                        <div id="urlInputSection" style="display: none;">
+                            <input type="text" class="form-input" id="bgImageUrl" placeholder="https://example.com/image.jpg" onchange="previewBgUrl()">
+                            <div class="bg-url-preview" id="bgUrlPreview" style="display: none; margin-top: 0.5rem; width: 100%; height: 100px; border-radius: 8px; background-size: cover; background-position: center;"></div>
+                        </div>
+
+                        <input type="hidden" id="selectedColor" value="#FF6B9D">
+                        <input type="hidden" id="bgImageData" value="">
+                        <input type="hidden" id="bgType" value="color">
+                    </div>
+
+                    <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: 500;" id="repeatYearlyText">Repeat Yearly</span>
+                        <div class="toggle" id="repeatToggle" onclick="this.classList.toggle('active')">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn" onclick="handleSubmit(event)">Save Countdown</button>
+                    <button type="button" class="delete-btn" id="deleteBtn" onclick="deleteCurrent()">Delete Countdown</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsOverlay" onclick="closeSettingsOnOverlay(event)">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="settingsTitle">⚙️ Settings</h2>
+                <button class="modal-close" onclick="closeSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="bg-url-section">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">🖼️ Background Image</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Enter image URL for background</div>
+                    <input type="text" class="bg-url-input" id="bgUrlInput" placeholder="https://example.com/image.jpg" onchange="updateBackgroundPreview()">
+                    <div class="bg-preview" id="bgPreview"></div>
+                    <button class="bg-clear-btn" id="bgClearBtn" style="display: none;" onclick="clearBackground()">Clear Background</button>
+                    <button class="submit-btn" style="margin-top: 0.5rem; padding: 0.75rem;" onclick="saveBackgroundUrl()">Apply Background</button>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title" id="dataManagementTitle">💾 Data Management</div>
+                    <div class="button-row">
+                        <button class="submit-btn" onclick="exportData()">
+                            💾 <span id="exportText">Export</span>
+                        </button>
+                        <button class="submit-btn secondary" onclick="importData()">
+                            📂 <span id="importText">Import</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-row">
+                        <div class="settings-row-text">
+                            <div style="font-weight: 600;" id="autoSaveTitle">💾 Auto-Save</div>
+                            <div class="settings-subtitle" id="autoSaveSubtitle">Auto-backup to file</div>
+                        </div>
+                        <div class="toggle" id="autoSaveToggle" onclick="toggleAutoSave()">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section" style="background: rgba(0,122,255,0.08); border: 1px solid rgba(0,122,255,0.2);">
+                    <div style="font-weight: 600; margin-bottom: 0.75rem;" id="languageTitle">🌐 Language</div>
+                    <select class="language-select" onchange="changeLanguage(this.value)" id="languageSelect">
+                        <option value="en">🇺🇸 English</option>
+                        <option value="sv">🇸🇪 Svenska</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="fr">🇫🇷 Français</option>
+                    </select>
+                    <div class="settings-info">
+                        <span id="selectedLabel">Selected</span>: <strong id="currentLangDisplay">English</strong>
+                    </div>
+                </div>
+
+                <div class="home-screen-section">
+                    <div style="font-weight: 600; margin-bottom: 0.75rem;" id="homeScreenTitle">📱 Add to Home Screen</div>
+                    <div class="home-screen-guide" id="homeScreenGuide">
+                        <strong>iOS:</strong> Safari → Share → Add to Home Screen<br>
+                        <strong>Android:</strong> Chrome → Menu → Add to Home Screen
+                    </div>
+                </div>
+
+                <!-- Privacy & Security Section -->
+                <div class="privacy-section">
+                    <div class="privacy-title">
+                        🔒 <span id="privacyTitle">Privacy & Security</span>
+                    </div>
+                    <div class="privacy-item">
+                        <div class="privacy-icon">✓</div>
+                        <div class="privacy-text">
+                            <strong id="privacyLocalTitle">100% Local Storage</strong>
+                            <span class="privacy-subtext" id="privacyLocalText">All your data is stored only on your device. Nothing is sent to any server.</span>
+                        </div>
+                    </div>
+                    <div class="privacy-item">
+                        <div class="privacy-icon">✓</div>
+                        <div class="privacy-text">
+                            <strong id="privacyNoLoginTitle">No Login Required</strong>
+                            <span class="privacy-subtext" id="privacyNoLoginText">No accounts, passwords, or personal information needed. Just open and use!</span>
+                        </div>
+                    </div>
+                    <div class="privacy-item">
+                        <div class="privacy-icon">✓</div>
+                        <div class="privacy-text">
+                            <strong id="privacyOfflineTitle">Works Offline</strong>
+                            <span class="privacy-subtext" id="privacyOfflineText">Use the app without internet connection. Your events are always available.</span>
+                        </div>
+                    </div>
+                    <div class="privacy-item">
+                        <div class="privacy-icon">✓</div>
+                        <div class="privacy-text">
+                            <strong id="privacyExportTitle">You Own Your Data</strong>
+                            <span class="privacy-subtext" id="privacyExportText">Export and import your data anytime. Your information belongs to you.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="donation-section">
+                    <div class="donation-title">
+                        <span class="donation-heart">☕</span>
+                        <span id="donationTitle">Buy me a coffee</span>
+                    </div>
+                    <div class="donation-text" id="donationText">
+                        If you enjoy using EventList, consider supporting me with a small donation. Every cup of coffee helps keep this app going!
+                    </div>
+                    <a href="https://www.paypal.com/donate?business=saftblandar@gmail.com&currency_code=USD" target="_blank" class="donation-btn" onclick="showToast('Thank you for your support! 🙏')">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.63l-1.496 9.478h2.79c.457 0 .85-.334.922-.788l.04-.19.73-4.627.047-.255a.933.933 0 0 1 .922-.788h.58c3.76 0 6.704-1.528 7.565-5.946.318-1.63.196-2.987-.507-3.689z"/>
+                        </svg>
+                        <span id="donationBtnText">Donate with PayPal</span>
+                    </a>
+                </div>
+
+                <div class="footer-info">
+                    <div style="font-weight: 600;">EventList</div>
+                    <div>© 2026 H4ppyAsian</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="importFileInput" accept=".json" style="display: none" onchange="handleImportFile(this)">
+
+    <!-- Detail View -->
+    <div class="detail-view" id="detailView">
+        <div class="detail-header">
+            <button class="modal-close" onclick="closeDetail()" style="width: 40px; height: 40px;">←</button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="modal-close" onclick="shareEvent()" style="width: 40px; height: 40px;" title="Share">📤</button>
+                <button class="modal-close" onclick="editCurrent()" style="width: 40px; height: 40px;" title="Edit">✏️</button>
+            </div>
+        </div>
+        <div class="detail-content">
+            <div class="notification-status-card" id="detailNotificationCard" style="display: none;">
+                <div class="notification-status-icon">🔔</div>
+                <div class="notification-status-content">
+                    <div class="notification-status-title" id="detailNotifTitle">Reminder Set</div>
+                    <div class="notification-status-text" id="detailNotificationText"></div>
+                </div>
+                <div class="toggle active" id="detailNotifToggle" onclick="toggleDetailNotification()">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+
+            <div class="detail-card" id="detailCard">
+                <div class="detail-icon" id="detailIcon">❤️</div>
+                <h1 class="detail-title" id="detailTitle">Event Name</h1>
+                <p class="detail-date" id="detailDate">Date</p>
+                <div class="detail-countdown-big" id="detailDays">0</div>
+                <div class="detail-countdown-label" id="detailLabel">days left</div>
+                <div class="live-countdown-detail" id="liveCountdown">00:00:00:00</div>
+            </div>
+
+            <div class="calendar-section">
+                <div class="calendar-title">📅 <span id="addToCalendarText">Add to Calendar</span></div>
+                <div class="calendar-buttons">
+                    <button class="calendar-btn" onclick="addToCalendar('google')">
+                        <span style="color: #4285F4;">G</span> Google
+                    </button>
+                    <button class="calendar-btn" onclick="addToCalendar('outlook')">
+                        <span style="color: #0078D4;">O</span> Outlook
+                    </button>
+                    <button class="calendar-btn" onclick="addToCalendar('ical')">
+                        📱 iCal
+                    </button>
+                </div>
+            </div>
+
+            <div class="calendar-section" style="background: linear-gradient(135deg, rgba(0,122,255,0.1) 0%, rgba(88,86,214,0.1) 100%); border: 1px solid rgba(0,122,255,0.2);">
+                <div class="calendar-title" id="shareEventTitle">📤 Share Event</div>
+                <div class="calendar-buttons">
+                    <button class="calendar-btn" onclick="shareEvent('copy')" id="copyTextBtn">
+                        📋 Copy
+                    </button>
+                    <button class="calendar-btn" onclick="shareEvent('whatsapp')" style="background: #25D366; color: white; border-color: #25D366;">
+                        💬 WhatsApp
+                    </button>
+                    <button class="calendar-btn" onclick="shareEvent('instagram')" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: white; border-color: transparent;">
+                        📷 Instagram
+                    </button>
+                    <button class="calendar-btn" onclick="shareEvent('facebook')" style="background: #1877F2; color: white; border-color: #1877F2;">
+                        👍 Facebook
+                    </button>
+                    <button class="calendar-btn" onclick="shareEvent('twitter')" style="background: #000000; color: white; border-color: #000000;">
+                        🐦 X/Twitter
+                    </button>
+                    <button class="calendar-btn" onclick="shareEvent('native')" id="shareBtn">
+                        📱 More
+                    </button>
+                </div>
+            </div>
+
+            <div class="todo-section">
+                <div class="todo-title">
+                    <span id="todoListTitle">✅ To-Do List</span>
+                    <span id="todoCount" style="font-size: 0.8rem; color: var(--text-secondary);">0/0</span>
+                </div>
+                <div class="todo-input-row">
+                    <input type="text" class="todo-input" id="todoInput" placeholder="Add a task..." onkeypress="if(event.key==='Enter')addTodo()">
+                    <button class="todo-add-btn" onclick="addTodo()">+</button>
+                </div>
+                <div class="todo-list" id="todoList">
+                    <div class="todo-empty" id="todoEmpty">No tasks yet. Add one above!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Saved!</div>
+
+    <script>
+
+        // ==================== DATA & STATE ====================
+        const colors = [
+            '#FF6B9D', '#5AC8FA', '#5856D6', '#FF9500', '#FF3B30',
+            '#34C759', '#007AFF', '#AF52DE', '#FFCC00', '#00C7BE',
+            '#8E8E93', '#C69C6D', '#1C1C1E', '#E5E5EA'
+        ];
+
+        const translations = {
+            en: {
+                timeOptional: "Time (Optional)",
+                locationOptional: "Location (Optional)",
+                appName: "EventList",
+                newCountdown: "New Countdown",
+                editCountdown: "Edit Countdown",
+                eventName: "Event Name *",
+                eventNamePlaceholder: "e.g., Anniversary",
+                date: "Date *",
+                remindMe: "Remind Me",
+                remindMeSubtitle: "Get notified before event starts",
+                enableNotification: "Enable Notification",
+                chooseIcon: "Choose Icon",
+                emoji: "Emoji",
+                photo: "Photo",
+                tapToChoose: "Tap to choose photo",
+                bgColor: "Background Color",
+                repeatYearly: "Repeat Yearly",
+                saveCountdown: "Save Countdown",
+                updateCountdown: "Update Countdown",
+                deleteCountdown: "Delete Countdown",
+                upcoming: "Upcoming",
+                past: "Past",
+                daysLeft: "days left",
+                daysAgo: "days ago",
+                emptyText: "No countdowns yet. Tap + to create one!",
+                settings: "⚙️ Settings",
+                dataManagement: "💾 Data Management",
+                export: "Export",
+                import: "Import",
+                autoSave: "💾 Auto-Save",
+                autoSaveSubtitle: "Auto-backup to file",
+                language: "🌐 Language",
+                selected: "Selected",
+                homeScreen: "📱 Add to Home Screen",
+                homeScreenGuide: "<strong>iOS:</strong> Safari → Share → Add to Home Screen<br><strong>Android:</strong> Chrome → Menu → Add to Home Screen",
+                shareEvent: "Share Event",
+                copyText: "Copy",
+                copied: "Copied! Open app to paste",
+                shareWhatsApp: "WhatsApp",
+                shareInstagram: "Instagram",
+                shareFacebook: "Facebook",
+                shareTwitter: "X/Twitter",
+                shareMore: "More",
+                reminderSet: "Reminder Set",
+                addToCalendar: "Add to Calendar",
+                todoList: "✅ To-Do List",
+                todoPlaceholder: "Add a task...",
+                todoEmpty: "No tasks yet. Add one above!",
+                backgroundImage: "🖼️ Background Image",
+                bgUrlPlaceholder: "Enter image URL for background",
+                applyBackground: "Apply Background",
+                                clearBackground: "Clear Background",
+                donationTitle: "☕ Buy me a coffee",
+                donationText: "If you enjoy using EventList, consider supporting me with a small donation. Every cup of coffee helps keep this app going!",
+                donationBtn: "Donate with PayPal",
+                privacyTitle: "🔒 Privacy & Security",
+                privacyLocalTitle: "100% Local Storage",
+                privacyLocalText: "All your data is stored only on your device. Nothing is sent to any server.",
+                privacyNoLoginTitle: "No Login Required",
+                privacyNoLoginText: "No accounts, passwords, or personal information needed. Just open and use!",
+                privacyOfflineTitle: "Works Offline",
+                privacyOfflineText: "Use the app without internet connection. Your events are always available.",
+                privacyExportTitle: "You Own Your Data",
+                privacyExportText: "Export and import your data anytime. Your information belongs to you."
+            },
+            sv: {
+                shareWhatsApp: "WhatsApp", shareInstagram: "Instagram", shareFacebook: "Facebook", shareTwitter: "X/Twitter", shareMore: "Mer",
+                shareEvent: "Dela Händelse",
+                copyText: "Kopiera Text",
+                copied: "Kopierad till urklipp!",
+                
+                timeOptional: "Tid (Valfritt)",
+                locationOptional: "Plats (Valfritt)",
+                appName: "EventList",
+                newCountdown: "Ny Nedräkning",
+                editCountdown: "Redigera Nedräkning",
+                eventName: "Händelsenamn *",
+                eventNamePlaceholder: "t.ex., Årsdag",
+                date: "Datum *",
+                remindMe: "Påminn Mig",
+                remindMeSubtitle: "Få notifiering innan händelsen startar",
+                enableNotification: "Aktivera Påminnelse",
+                chooseIcon: "Välj Ikon",
+                emoji: "Emoji",
+                photo: "Foto",
+                tapToChoose: "Tryck för att välja foto",
+                bgColor: "Bakgrundsfärg",
+                repeatYearly: "Årlig Upprepning",
+                saveCountdown: "Spara Nedräkning",
+                updateCountdown: "Uppdatera Nedräkning",
+                deleteCountdown: "Ta Bort Nedräkning",
+                upcoming: "Kommande",
+                past: "Tidigare",
+                daysLeft: "dagar kvar",
+                daysAgo: "dagar sedan",
+                emptyText: "Inga nedräkningar än. Tryck + för att skapa en!",
+                settings: "⚙️ Inställningar",
+                dataManagement: "💾 Datahantering",
+                export: "Exportera",
+                import: "Importera",
+                autoSave: "💾 Auto-Spara",
+                autoSaveSubtitle: "Auto-backup till fil",
+                language: "🌐 Språk",
+                selected: "Vald",
+                homeScreen: "📱 Lägg till på Hemskärmen",
+                homeScreenGuide: "<strong>iOS:</strong> Safari → Dela → Lägg till på hemskärmen<br><strong>Android:</strong> Chrome → Meny → Lägg till på hemskärmen",
+                reminderSet: "Påminnelse Inställd",
+                addToCalendar: "Lägg till i Kalender",
+                todoList: "✅ Att-Göra Lista",
+                todoPlaceholder: "Lägg till en uppgift...",
+                todoEmpty: "Inga uppgifter än. Lägg till en ovan!",
+                backgroundImage: "🖼️ Bakgrundsbild",
+                bgUrlPlaceholder: "Ange bild-URL för bakgrund",
+                applyBackground: "Tillämpa Bakgrund",
+                clearBackground: "Rensa Bakgrund",
+                donationTitle: "☕ Bjud mig på en kaffe",
+                donationText: "Om du gillar EventList, överväg att stödja mig med en liten donation. Varje kopp kaffe hjälper till att hålla appen vid liv!",
+                donationBtn: "Donera med PayPal",
+                privacyTitle: "🔒 Integritet & Säkerhet",
+                privacyLocalTitle: "100% Lokal Lagring",
+                privacyLocalText: "All din data lagras endast på din enhet. Ingenting skickas till någon server.",
+                privacyNoLoginTitle: "Ingen Inloggning Krävs",
+                privacyNoLoginText: "Inga konton, lösenord eller personlig information behövs. Öppna och använd bara!",
+                privacyOfflineTitle: "Fungerar Offline",
+                privacyOfflineText: "Använd appen utan internetanslutning. Dina evenemang är alltid tillgängliga.",
+                privacyExportTitle: "Du Äger Din Data",
+                privacyExportText: "Exportera och importera din data när som helst. Din information tillhör dig."
+            },
+            es: {
+                shareWhatsApp: "WhatsApp", shareInstagram: "Instagram", shareFacebook: "Facebook", shareTwitter: "X/Twitter", shareMore: "Más",
+                shareEvent: "Compartir Evento",
+                copyText: "Copiar Texto",
+                copied: "Copiado al portapapeles!",
+                
+                timeOptional: "Hora (Opcional)",
+                locationOptional: "Ubicación (Opcional)",
+                appName: "EventList",
+                newCountdown: "Nueva Cuenta Regresiva",
+                editCountdown: "Editar Cuenta Regresiva",
+                eventName: "Nombre del Evento *",
+                eventNamePlaceholder: "ej., Aniversario",
+                date: "Fecha *",
+                remindMe: "Recordarme",
+                remindMeSubtitle: "Recibir notificación antes del evento",
+                enableNotification: "Activar Notificación",
+                chooseIcon: "Elegir Icono",
+                emoji: "Emoji",
+                photo: "Foto",
+                tapToChoose: "Toca para elegir foto",
+                bgColor: "Color de Fondo",
+                repeatYearly: "Repetir Anualmente",
+                saveCountdown: "Guardar Cuenta Regresiva",
+                updateCountdown: "Actualizar Cuenta Regresiva",
+                deleteCountdown: "Eliminar Cuenta Regresiva",
+                upcoming: "Próximos",
+                past: "Pasados",
+                daysLeft: "días restantes",
+                daysAgo: "días atrás",
+                emptyText: "¡Aún no hay cuentas regresivas. Toca + para crear una!",
+                settings: "⚙️ Ajustes",
+                dataManagement: "💾 Gestión de Datos",
+                export: "Exportar",
+                import: "Importar",
+                autoSave: "💾 Auto-Guardar",
+                autoSaveSubtitle: "Auto-copia de seguridad",
+                language: "🌐 Idioma",
+                selected: "Seleccionado",
+                homeScreen: "📱 Añadir a Pantalla de Inicio",
+                homeScreenGuide: "<strong>iOS:</strong> Safari → Compartir → Añadir a pantalla de inicio<br><strong>Android:</strong> Chrome → Menú → Añadir a pantalla de inicio",
+                reminderSet: "Recordatorio Configurado",
+                addToCalendar: "Añadir al Calendario",
+                todoList: "✅ Lista de Tareas",
+                todoPlaceholder: "Añadir una tarea...",
+                todoEmpty: "¡Aún no hay tareas. Añade una arriba!",
+                backgroundImage: "🖼️ Imagen de Fondo",
+                bgUrlPlaceholder: "Ingresa URL de imagen para fondo",
+                applyBackground: "Aplicar Fondo",
+                clearBackground: "Limpiar Fondo",
+                donationTitle: "☕ Invítame a un café",
+                donationText: "Si disfrutas usando EventList, considera apoyarme con una pequeña donación. ¡Cada taza de café ayuda a mantener esta app en marcha!",
+                donationBtn: "Donar con PayPal",
+                privacyTitle: "🔒 Privacidad y Seguridad",
+                privacyLocalTitle: "100% Almacenamiento Local",
+                privacyLocalText: "Todos tus datos se almacenan solo en tu dispositivo. Nada se envía a ningún servidor.",
+                privacyNoLoginTitle: "No Requiere Inicio de Sesión",
+                privacyNoLoginText: "No se necesitan cuentas, contraseñas ni información personal. ¡Solo abre y usa!",
+                privacyOfflineTitle: "Funciona Sin Conexión",
+                privacyOfflineText: "Usa la app sin conexión a internet. Tus eventos siempre están disponibles.",
+                privacyExportTitle: "Tú Posees Tus Datos",
+                privacyExportText: "Exporta e importa tus datos en cualquier momento. Tu información te pertenece."
+            },
+            de: {
+                shareWhatsApp: "WhatsApp", shareInstagram: "Instagram", shareFacebook: "Facebook", shareTwitter: "X/Twitter", shareMore: "Mehr",
+                shareEvent: "Event Teilen",
+                copyText: "Text Kopieren",
+                copied: "In Zwischenablage kopiert!",
+                
+                timeOptional: "Zeit (Optional)",
+                locationOptional: "Ort (Optional)",
+                appName: "EventList",
+                newCountdown: "Neuer Countdown",
+                editCountdown: "Countdown Bearbeiten",
+                eventName: "Ereignisname *",
+                eventNamePlaceholder: "z.B., Jahrestag",
+                date: "Datum *",
+                remindMe: "Erinnern",
+                remindMeSubtitle: "Benachrichtigung vor Ereignisstart",
+                enableNotification: "Benachrichtigung Aktivieren",
+                chooseIcon: "Symbol Wählen",
+                emoji: "Emoji",
+                photo: "Foto",
+                tapToChoose: "Tippen um Foto zu wählen",
+                bgColor: "Hintergrundfarbe",
+                repeatYearly: "Jährlich Wiederholen",
+                saveCountdown: "Countdown Speichern",
+                updateCountdown: "Countdown Aktualisieren",
+                deleteCountdown: "Countdown Löschen",
+                upcoming: "Bevorstehende",
+                past: "Vergangene",
+                daysLeft: "Tage übrig",
+                daysAgo: "Tage her",
+                emptyText: "Noch keine Countdowns. Tippen Sie + um einen zu erstellen!",
+                settings: "⚙️ Einstellungen",
+                dataManagement: "💾 Datenverwaltung",
+                export: "Exportieren",
+                import: "Importieren",
+                autoSave: "💾 Auto-Speichern",
+                autoSaveSubtitle: "Auto-Backup in Datei",
+                language: "🌐 Sprache",
+                selected: "Ausgewählt",
+                homeScreen: "📱 Zum Startbildschirm Hinzufügen",
+                homeScreenGuide: "<strong>iOS:</strong> Safari → Teilen → Zum Startbildschirm<br><strong>Android:</strong> Chrome → Menü → Zum Startbildschirm",
+                reminderSet: "Erinnerung Gesetzt",
+                addToCalendar: "Zum Kalender Hinzufügen",
+                todoList: "✅ Aufgabenliste",
+                todoPlaceholder: "Aufgabe hinzufügen...",
+                todoEmpty: "Noch keine Aufgaben. Fügen Sie eine oben hinzu!",
+                backgroundImage: "🖼️ Hintergrundbild",
+                bgUrlPlaceholder: "Bild-URL für Hintergrund eingeben",
+                applyBackground: "Hintergrund Anwenden",
+                clearBackground: "Hintergrund Löschen",
+                donationTitle: "☕ Spendier mir einen Kaffee",
+                donationText: "Wenn dir EventList gefällt, erwäge, mich mit einer kleinen Spende zu unterstützen. Jede Tasse Kaffee hilft, diese App am Laufen zu halten!",
+                donationBtn: "Mit PayPal spenden",
+                privacyTitle: "🔒 Datenschutz & Sicherheit",
+                privacyLocalTitle: "100% Lokale Speicherung",
+                privacyLocalText: "Alle Ihre Daten werden nur auf Ihrem Gerät gespeichert. Nichts wird an Server gesendet.",
+                privacyNoLoginTitle: "Keine Anmeldung Erforderlich",
+                privacyNoLoginText: "Keine Konten, Passwörter oder persönliche Daten nötig. Einfach öffnen und nutzen!",
+                privacyOfflineTitle: "Funktioniert Offline",
+                privacyOfflineText: "Nutzen Sie die App ohne Internetverbindung. Ihre Ereignisse sind immer verfügbar.",
+                privacyExportTitle: "Sie Besitzen Ihre Daten",
+                privacyExportText: "Exportieren und importieren Sie Ihre Daten jederzeit. Ihre Informationen gehören Ihnen."
+            },
+            fr: {
+                shareWhatsApp: "WhatsApp", shareInstagram: "Instagram", shareFacebook: "Facebook", shareTwitter: "X/Twitter", shareMore: "Plus",
+                shareEvent: "Partager l'Événement",
+                copyText: "Copier le Texte",
+                copied: "Copié dans le presse-papiers!",
+                
+                timeOptional: "Heure (Optionnel)",
+                locationOptional: "Lieu (Optionnel)",
+                appName: "EventList",
+                newCountdown: "Nouveau Compte à Rebours",
+                editCountdown: "Modifier le Compte à Rebours",
+                eventName: "Nom de l'Événement *",
+                eventNamePlaceholder: "ex., Anniversaire",
+                date: "Date *",
+                remindMe: "Me Rappeler",
+                remindMeSubtitle: "Recevoir une notification avant l'événement",
+                enableNotification: "Activer la Notification",
+                chooseIcon: "Choisir l'Icône",
+                emoji: "Emoji",
+                photo: "Photo",
+                tapToChoose: "Appuyez pour choisir une photo",
+                bgColor: "Couleur de Fond",
+                repeatYearly: "Répéter Annuellement",
+                saveCountdown: "Sauvegarder le Compte à Rebours",
+                updateCountdown: "Mettre à Jour le Compte à Rebours",
+                deleteCountdown: "Supprimer le Compte à Rebours",
+                upcoming: "À Venir",
+                past: "Passés",
+                daysLeft: "jours restants",
+                daysAgo: "jours passés",
+                emptyText: "Pas encore de comptes à rebours. Appuyez sur + pour en créer un!",
+                settings: "⚙️ Paramètres",
+                dataManagement: "💾 Gestion des Données",
+                export: "Exporter",
+                import: "Importer",
+                autoSave: "💾 Sauvegarde Auto",
+                autoSaveSubtitle: "Sauvegarde auto dans fichier",
+                language: "🌐 Langue",
+                selected: "Sélectionné",
+                homeScreen: "📱 Ajouter à l'Écran d'Accueil",
+                homeScreenGuide: "<strong>iOS:</strong> Safari → Partager → Ajouter à l'écran d'accueil<br><strong>Android:</strong> Chrome → Menu → Ajouter à l'écran d'accueil",
+                reminderSet: "Rappel Configuré",
+                addToCalendar: "Ajouter au Calendrier",
+                todoList: "✅ Liste de Tâches",
+                todoPlaceholder: "Ajouter une tâche...",
+                todoEmpty: "Pas encore de tâches. Ajoutez-en une ci-dessus!",
+                backgroundImage: "🖼️ Image de Fond",
+                bgUrlPlaceholder: "Entrez l'URL de l'image pour le fond",
+                applyBackground: "Appliquer le Fond",
+                clearBackground: "Effacer le Fond",
+                donationTitle: "☕ Offrez-moi un café",
+                donationText: "Si vous appréciez EventList, envisagez de me soutenir avec un petit don. Chaque tasse de café aide à maintenir cette application en vie !",
+                donationBtn: "Faire un don avec PayPal",
+                privacyTitle: "🔒 Confidentialité et Sécurité",
+                privacyLocalTitle: "100% Stockage Local",
+                privacyLocalText: "Toutes vos données sont stockées uniquement sur votre appareil. Rien n'est envoyé à un serveur.",
+                privacyNoLoginTitle: "Aucune Connexion Requise",
+                privacyNoLoginText: "Pas de comptes, mots de passe ou informations personnelles nécessaires. Ouvrez et utilisez!",
+                privacyOfflineTitle: "Fonctionne Hors Ligne",
+                privacyOfflineText: "Utilisez l'application sans connexion internet. Vos événements sont toujours disponibles.",
+                privacyExportTitle: "Vous Possédez Vos Données",
+                privacyExportText: "Exportez et importez vos données à tout moment. Vos informations vous appartiennent."
+            }
+        };
+
+        let currentLang = localStorage.getItem('eventlist-language') || 'en';
+        let countdowns = [];
+        let currentId = null;
+        let liveCountdownInterval = null;
+        let autoSaveEnabled = localStorage.getItem('eventlist-autosave') === 'true';
+        let backgroundUrl = localStorage.getItem('eventlist-bg-url') || '';
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function t(key) {
+            return translations[currentLang] && translations[currentLang][key] 
+                ? translations[currentLang][key] 
+                : translations['en'][key] || key;
         }
 
-        function openDetail(id) {
-            const ev = events.find(x => x.id === id);
-            currentEditingId = id;
-            
-            document.getElementById('dHero').style.backgroundImage = `url(${ev.img})`;
-            document.getElementById('dName').innerText = ev.name;
-            document.getElementById('dDateFull').innerText = new Date(ev.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('dIcon').innerHTML = `<img src="${ev.img}">`;
-            
-            const diff = new Date(ev.date) - new Date();
-            document.getElementById('dBigDays').innerText = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-            
-            openModal('detailView');
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatLiveCountdown(ms) {
+            if (ms <= 0) return '00:00:00:00';
+            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+            return pad(days) + ':' + pad(hours) + ':' + pad(minutes) + ':' + pad(seconds);
+        }
+
+        function pad(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        function getNotifLabel(minutes) {
+            if (minutes < 60) return minutes + ' min';
+            if (minutes === 60) return '1 hour';
+            if (minutes === 1440) return '1 day';
+            if (minutes === 2880) return '2 days';
+            return Math.floor(minutes/60) + ' hours';
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            renderColorGrid();
+            renderCountdowns();
+            updateAllTranslations();
+            applyBackground();
+            startLiveCountdown();
+
+            // Set default date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('eventDate').value = tomorrow.toISOString().split('T')[0];
+
+            // Set saved language
+            document.getElementById('languageSelect').value = currentLang;
+            const names = {en: 'English', sv: 'Svenska', es: 'Español', de: 'Deutsch', fr: 'Français'};
+            document.getElementById('currentLangDisplay').textContent = names[currentLang] || currentLang;
+
+            // Set saved background
+            if (backgroundUrl) {
+                document.getElementById('bgUrlInput').value = backgroundUrl;
+                updateBackgroundPreview();
+            }
+
+            // Set auto-save toggle
+            document.getElementById('autoSaveToggle').classList.toggle('active', autoSaveEnabled);
+        });
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('countdowns');
+                if (saved) {
+                    countdowns = JSON.parse(saved);
+                }
+            } catch (e) {
+                countdowns = [];
+            }
+        }
+
+        // ==================== TRANSLATION SYSTEM ====================
+        function updateAllTranslations() {
+            const elements = {
+                'appLogo': 'appName',
+                'modalTitle': 'newCountdown',
+                'eventNameLabel': 'eventName',
+                'eventDateLabel': 'date',
+                'remindMeTitle': 'remindMe',
+                'remindMeSubtitle': 'remindMeSubtitle',
+                'enableNotificationText': 'enableNotification',
+                'chooseIconLabel': 'chooseIcon',
+                'emojiLabel': 'emoji',
+                'photoLabel': 'photo',
+                'tapToChoose': 'tapToChoose',
+                'bgColorLabel': 'bgColor',
+                'repeatYearlyText': 'repeatYearly',
+                'submitBtn': 'saveCountdown',
+                'deleteBtn': 'deleteCountdown',
+                'upcomingHeader': 'upcoming',
+                'pastHeader': 'past',
+                'emptyText': 'emptyText',
+                'settingsTitle': 'settings',
+                'dataManagementTitle': 'dataManagement',
+                'exportText': 'export',
+                'importText': 'import',
+                'autoSaveTitle': 'autoSave',
+                'autoSaveSubtitle': 'autoSaveSubtitle',
+                'languageTitle': 'language',
+                'selectedLabel': 'selected',
+                'homeScreenTitle': 'homeScreen',
+                'detailNotifTitle': 'reminderSet',
+                'addToCalendarText': 'addToCalendar',
+                'todoListTitle': 'todoList',
+                'shareEventTitle': 'shareEvent',
+                'donationTitle': 'donationTitle',
+                'donationText': 'donationText',
+                'donationBtnText': 'donationBtn',
+                'copyTextBtn': 'copyText',
+                'shareBtn': 'shareMore',
+                'privacyTitle': 'privacyTitle',
+                'privacyLocalTitle': 'privacyLocalTitle',
+                'privacyLocalText': 'privacyLocalText',
+                'privacyNoLoginTitle': 'privacyNoLoginTitle',
+                'privacyNoLoginText': 'privacyNoLoginText',
+                'privacyOfflineTitle': 'privacyOfflineTitle',
+                'privacyOfflineText': 'privacyOfflineText',
+                'privacyExportTitle': 'privacyExportTitle',
+                'privacyExportText': 'privacyExportText'
+            };
+
+            for (const [id, key] of Object.entries(elements)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (key === 'homeScreenGuide') {
+                        el.innerHTML = t(key);
+                    } else {
+                        el.textContent = t(key);
+                    }
+                }
+            }
+
+            // Update placeholders
+            document.getElementById('eventName').placeholder = t('eventNamePlaceholder');
+            document.getElementById('todoInput').placeholder = t('todoPlaceholder');
+            document.getElementById('bgUrlInput').placeholder = t('bgUrlPlaceholder');
+
+            // Update home screen guide
+            document.getElementById('homeScreenGuide').innerHTML = t('homeScreenGuide');
+
+            // Update todo empty text
+            const todoEmpty = document.getElementById('todoEmpty');
+            if (todoEmpty) todoEmpty.textContent = t('todoEmpty');
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('eventlist-language', lang);
+            updateAllTranslations();
+            renderCountdowns();
+
+            const names = {en: 'English', sv: 'Svenska', es: 'Español', de: 'Deutsch', fr: 'Français'};
+            document.getElementById('currentLangDisplay').textContent = names[lang] || lang;
+            showToast(t('language') + ': ' + (names[lang] || lang));
+        }
+
+        // ==================== RENDERING ====================
+        function renderColorGrid() {
+            const grid = document.getElementById('colorGrid');
+            let html = '';
+
+            colors.forEach(function(color, index) {
+                const isChecked = index === 0 ? 'checked' : '';
+                html += '<label class="color-option">' +
+                    '<input type="radio" name="color" value="' + color + '" ' + isChecked + ' onchange="selectColor(this.value)">' +
+                    '<div class="color-circle" style="background: ' + color + ';"></div>' +
+                '</label>';
+            });
+
+            // Add custom color picker
+            html += '<label class="color-option custom-color">' +
+                '<input type="radio" name="color" value="custom" id="customColorRadio" onchange="pickCustomColor()">' +
+                '<div class="color-circle" style="background: linear-gradient(135deg, #FF6B9D, #5AC8FA, #34C759); display: flex; align-items: center; justify-content: center;">' +
+                    '<span style="color: white; font-size: 1.2rem;">+</span>' +
+                '</div>' +
+            '</label>';
+
+            grid.innerHTML = html;
+        }
+
+        function selectColor(color) {
+            document.getElementById('selectedColor').value = color;
+            document.getElementById('bgType').value = 'color';
+            document.getElementById('bgImageData').value = '';
+        }
+
+        function pickCustomColor() {
+            const input = document.createElement('input');
+            input.type = 'color';
+            input.value = '#FF6B9D';
+            input.onchange = function() {
+                document.getElementById('selectedColor').value = this.value;
+                // Update the custom color circle to show selected color
+                const customCircle = document.querySelector('.custom-color .color-circle');
+                if (customCircle) {
+                    customCircle.style.background = this.value;
+                }
+            };
+            input.click();
+        }
+
+        function selectBgType(type) {
+            document.getElementById('bgType').value = type;
+
+            // Update button states
+            document.getElementById('bgTypeColor').classList.toggle('active', type === 'color');
+            document.getElementById('bgTypeImage').classList.toggle('active', type === 'image');
+            document.getElementById('bgTypeUrl').classList.toggle('active', type === 'url');
+
+            // Show/hide sections
+            document.getElementById('colorPickerSection').style.display = type === 'color' ? 'block' : 'none';
+            document.getElementById('imageUploadSection').style.display = type === 'image' ? 'block' : 'none';
+            document.getElementById('urlInputSection').style.display = type === 'url' ? 'block' : 'none';
+        }
+
+        function handleBgImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image too large! Max 5MB. Please choose a smaller image.');
+                input.value = '';
+                return;
+            }
+
+            // Show file info
+            const sizeKB = (file.size / 1024).toFixed(1);
+            showToast('Uploading background: ' + sizeKB + 'KB...');
+
+            // Compress background image (larger size allowed for backgrounds, no icon warnings)
+            compressImage(file, 800, 600, 0.6, function(imgData) {
+                document.getElementById('bgUploadPreview').src = imgData;
+                document.getElementById('bgImageData').value = imgData;
+                document.getElementById('bgImageUploadArea').classList.add('has-bg-image');
+                document.getElementById('selectedColor').value = '';
+                const compressedSize = (imgData.length * 0.75 / 1024).toFixed(1);
+                showToast('Background uploaded! (' + compressedSize + 'KB)');
+            }, false); // false = not icon, no special warnings
+        }
+
+        function removeBgImage(e) {
+            e.stopPropagation();
+            document.getElementById('bgImageInput').value = '';
+            document.getElementById('bgUploadPreview').src = '';
+            document.getElementById('bgImageData').value = '';
+            document.getElementById('bgImageUploadArea').classList.remove('has-bg-image');
+        }
+
+        function previewBgUrl() {
+            const url = document.getElementById('bgImageUrl').value.trim();
+            const preview = document.getElementById('bgUrlPreview');
+
+            if (url) {
+                preview.style.backgroundImage = 'url(' + url + ')';
+                preview.style.display = 'block';
+                document.getElementById('bgImageData').value = url;
+                document.getElementById('selectedColor').value = '';
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function generateCountdownItemHTML(c, isPast) {
+            const dateObj = new Date(c.date);
+            const dateStr = dateObj.toLocaleDateString(currentLang === 'en' ? 'en-US' : currentLang, { 
+                weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' 
+            });
+
+            let iconHtml;
+            if (c.image) {
+                iconHtml = '<img src="' + c.image + '" alt="' + escapeHtml(c.name) + '" onerror="this.style.display=' + "'none'" + '; this.parentNode.textContent=' + "'📅'" + ';">';
+            } else {
+                iconHtml = c.emoji || '📅';
+            }
+
+            const notifBadge = c.notification ? '<div class="notification-indicator">🔔</div>' : '';
+            const daysLabel = isPast ? t('daysAgo') : t('daysLeft');
+
+            const now = new Date();
+            const eventDate = new Date(c.date);
+            eventDate.setHours(0, 0, 0, 0);
+            const diffMs = eventDate - now;
+            const liveTime = isPast ? '' : formatLiveCountdown(diffMs);
+
+            // Determine background style
+            let bgStyle = '';
+            let hasImageClass = '';
+            if (c.bgType === 'image' || c.bgType === 'url') {
+                if (c.bgImage) {
+                    bgStyle = 'background-image: url(' + c.bgImage + '); background-size: cover; background-position: center;';
+                    hasImageClass = 'has-image';
+                } else {
+                    bgStyle = 'background: ' + (c.color || '#FF6B9D') + ';';
+                }
+            } else {
+                bgStyle = 'background: ' + (c.color || '#FF6B9D') + ';';
+            }
+
+            // Build date/time/location display
+            let dateTimeStr = dateStr;
+            if (c.time) {
+                dateTimeStr += ' • ' + c.time;
+            }
+
+            return '<div class="countdown-item ' + (isPast ? 'past ' : '') + hasImageClass + '" onclick="openDetailView(' + c.id + ')" style="' + bgStyle + '">' +
+                '<div class="countdown-content">' +
+                    '<div class="countdown-icon">' + iconHtml + notifBadge + '</div>' +
+                    '<div class="countdown-info">' +
+                        '<div class="countdown-title">' + escapeHtml(c.name) + '</div>' +
+                        '<div class="countdown-date">' + dateTimeStr + '</div>' +
+                        (c.location ? '<div class="countdown-location" style="font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 0.2rem;">📍 ' + escapeHtml(c.location) + '</div>' : '') +
+                        (liveTime ? '<div class="live-countdown" id="live-' + c.id + '">' + liveTime + '</div>' : '') +
+                    '</div>' +
+                '</div>' +
+                '<div class="countdown-days">' +
+                    '<div class="days-number">' + c.days + '</div>' +
+                    '<div class="days-label">' + daysLabel + '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function renderCountdowns() {
+            const upcomingList = document.getElementById('upcomingList');
+            const pastList = document.getElementById('pastList');
+            const pastHeader = document.getElementById('pastHeader');
+
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            const upcoming = [];
+            const past = [];
+
+            countdowns.forEach(function(c) {
+                const eventDate = new Date(c.date);
+                eventDate.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+
+                if (diffDays >= 0) {
+                    upcoming.push({ ...c, days: diffDays });
+                } else {
+                    past.push({ ...c, days: Math.abs(diffDays) });
+                }
+            });
+
+            upcoming.sort(function(a, b) { return a.days - b.days; });
+            past.sort(function(a, b) { return b.days - a.days; });
+
+            if (upcoming.length === 0) {
+                upcomingList.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p id="emptyText">' + t('emptyText') + '</p></div>';
+            } else {
+                upcomingList.innerHTML = upcoming.map(function(c) { return generateCountdownItemHTML(c, false); }).join('');
+            }
+
+            pastHeader.style.display = past.length > 0 ? 'block' : 'none';
+            pastList.innerHTML = past.map(function(c) { return generateCountdownItemHTML(c, true); }).join('');
+        }
+
+        // ==================== LIVE COUNTDOWN ====================
+        function startLiveCountdown() {
+            if (liveCountdownInterval) clearInterval(liveCountdownInterval);
+
+            liveCountdownInterval = setInterval(function() {
+                const now = new Date();
+
+                countdowns.forEach(function(c) {
+                    const eventDate = new Date(c.date);
+                    eventDate.setHours(0, 0, 0, 0);
+                    const diffMs = eventDate - now;
+
+                    const liveEl = document.getElementById('live-' + c.id);
+                    if (liveEl && diffMs > 0) {
+                        liveEl.textContent = formatLiveCountdown(diffMs);
+                    }
+                });
+
+                if (currentId && document.getElementById('detailView').classList.contains('active')) {
+                    const countdown = countdowns.find(function(c) { return c.id === currentId; });
+                    if (countdown) {
+                        const eventDate = new Date(countdown.date);
+                        eventDate.setHours(0, 0, 0, 0);
+                        const diffMs = eventDate - now;
+                        const liveEl = document.getElementById('liveCountdown');
+                        if (liveEl) {
+                            liveEl.textContent = diffMs > 0 ? formatLiveCountdown(diffMs) : '00:00:00:00';
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        // ==================== MODAL FUNCTIONS ====================
+        function openModal() {
+            document.getElementById('modalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            resetForm();
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target === e.currentTarget) closeModal();
+        }
+
+        function resetForm() {
+            document.getElementById('countdownForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('modalTitle').textContent = t('newCountdown');
+            document.getElementById('submitBtn').textContent = t('saveCountdown');
+            document.getElementById('deleteBtn').style.display = 'none';
+
+            document.getElementById('selectedEmoji').value = '❤️';
+            document.querySelectorAll('.emoji-btn').forEach(function(b) { b.classList.remove('selected'); });
+            document.querySelector('.emoji-btn').classList.add('selected');
+
+            document.getElementById('imageData').value = '';
+            document.getElementById('uploadPreview').src = '';
+            document.getElementById('imageUploadArea').classList.remove('has-image');
+            document.getElementById('imageInput').value = '';
+
+            document.getElementById('notificationToggle').classList.remove('active');
+            document.getElementById('notificationOptions').classList.remove('show');
+            document.getElementById('repeatToggle').classList.remove('active');
+
+            selectIconType('emoji');
+
+            // Reset time and location
+            document.getElementById('eventTime').value = '';
+            document.getElementById('eventLocation').value = '';
+
+            // Reset background
+            selectBgType('color');
+            document.getElementById('selectedColor').value = '#FF6B9D';
+            document.getElementById('bgType').value = 'color';
+            document.getElementById('bgImageData').value = '';
+            document.getElementById('bgImageUrl').value = '';
+            document.getElementById('bgUploadPreview').src = '';
+            document.getElementById('bgImageUploadArea').classList.remove('has-bg-image');
+            document.getElementById('bgUrlPreview').style.display = 'none';
+            renderColorGrid();
+
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('eventDate').value = tomorrow.toISOString().split('T')[0];
+        }
+
+        function selectIconType(type) {
+            document.getElementById('emojiOption').classList.toggle('active', type === 'emoji');
+            document.getElementById('imageOption').classList.toggle('active', type === 'image');
+            document.getElementById('emojiPicker').style.display = type === 'emoji' ? 'grid' : 'none';
+            document.getElementById('imageUploadWrapper').style.display = type === 'image' ? 'block' : 'none';
+        }
+
+        function selectEmoji(emoji, btn) {
+            document.getElementById('selectedEmoji').value = emoji;
+            document.querySelectorAll('.emoji-btn').forEach(function(b) { b.classList.remove('selected'); });
+            if (btn) btn.classList.add('selected');
+        }
+
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image too large! Max 5MB. Please choose a smaller image.');
+                input.value = '';
+                return;
+            }
+
+            // Show file info
+            const sizeKB = (file.size / 1024).toFixed(1);
+            showToast('Uploading: ' + file.name + ' (' + sizeKB + 'KB)...');
+
+            // Compress and resize image (isIcon = true for warnings)
+            compressImage(file, 400, 400, 0.7, function(imgData) {
+                document.getElementById('uploadPreview').src = imgData;
+                document.getElementById('imageData').value = imgData;
+                document.getElementById('imageUploadArea').classList.add('has-image');
+
+                // Auto-apply as background too
+                selectBgType('image');
+                document.getElementById('bgUploadPreview').src = imgData;
+                document.getElementById('bgImageData').value = imgData;
+                document.getElementById('bgImageUploadArea').classList.add('has-bg-image');
+            }, true); // true = isIcon, show compression warnings
+        }
+
+        function compressImage(file, maxWidth, maxHeight, quality, callback, isIcon) {
+            const originalSize = (file.size / 1024).toFixed(1);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    let width = img.width;
+                    let height = img.height;
+                    const originalDimensions = width + 'x' + height;
+
+                    // Show warning if image is very large
+                    if (isIcon && (file.size > 1024 * 1024 || width > 1000 || height > 1000)) {
+                        showToast('Large image detected (' + originalDimensions + ', ' + originalSize + 'KB). Compressing...');
+                    }
+
+                    // Calculate new dimensions
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+
+                    // Create canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    // Draw and compress
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Get compressed data URL
+                    const compressedData = canvas.toDataURL('image/jpeg', quality);
+
+                    // Show compression result for icons
+                    if (isIcon) {
+                        const compressedSize = (compressedData.length * 0.75 / 1024).toFixed(1);
+                        const newDimensions = Math.round(width) + 'x' + Math.round(height);
+                        showToast('Compressed: ' + originalDimensions + ' → ' + newDimensions + ' (' + compressedSize + 'KB)');
+                    }
+
+                    callback(compressedData);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage(e) {
+            e.stopPropagation();
+            document.getElementById('imageInput').value = '';
+            document.getElementById('uploadPreview').src = '';
+            document.getElementById('imageData').value = '';
+            document.getElementById('imageUploadArea').classList.remove('has-image');
+        }
+
+        function toggleNotification() {
+            const toggle = document.getElementById('notificationToggle');
+            const options = document.getElementById('notificationOptions');
+            toggle.classList.toggle('active');
+            options.classList.toggle('show');
+        }
+
+        // ==================== FORM SUBMISSION ====================
+        function handleSubmit(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('editId').value;
+            const name = document.getElementById('eventName').value.trim();
+            const date = document.getElementById('eventDate').value;
+            const time = document.getElementById('eventTime').value;
+            const location = document.getElementById('eventLocation').value.trim();
+            const color = document.getElementById('selectedColor').value;
+            const emoji = document.getElementById('selectedEmoji').value;
+            const imageData = document.getElementById('imageData').value;
+            const repeatYearly = document.getElementById('repeatToggle').classList.contains('active');
+            const bgType = document.getElementById('bgType').value;
+            const bgImageData = document.getElementById('bgImageData').value;
+
+            if (!name || !date) {
+                showToast('Please fill in all required fields');
+                return;
+            }
+
+            let notification = null;
+            const notifToggle = document.getElementById('notificationToggle');
+            if (notifToggle.classList.contains('active')) {
+                const notifTime = document.querySelector('input[name="notifyTime"]:checked');
+                if (notifTime) {
+                    notification = { enabled: true, minutes: parseInt(notifTime.value) };
+                }
+            }
+
+            const isImage = document.getElementById('imageUploadWrapper').style.display !== 'none' && imageData;
+
+            // Handle background
+            let finalBgType = bgType;
+            let finalBgImage = '';
+            let finalColor = color;
+
+            if (bgType === 'image' || bgType === 'url') {
+                finalBgImage = bgImageData;
+                if (!finalColor) finalColor = '#FF6B9D';
+            }
+
+            const countdown = {
+                id: id ? parseInt(id) : Date.now(),
+                name: name,
+                date: date,
+                time: time || null,
+                location: location || null,
+                color: finalColor,
+                emoji: isImage ? null : emoji,
+                image: isImage ? imageData : null,
+                repeatYearly: repeatYearly,
+                notification: notification,
+                bgType: finalBgType,
+                bgImage: finalBgImage,
+                todos: id ? (countdowns.find(function(c) { return c.id === parseInt(id); }) || {}).todos || [] : []
+            };
+
+            if (id) {
+                const index = countdowns.findIndex(function(c) { return c.id === parseInt(id); });
+                if (index !== -1) {
+                    countdowns[index] = countdown;
+                }
+            } else {
+                countdowns.push(countdown);
+            }
+
+            saveCountdowns();
+            renderCountdowns();
+            closeModal();
+            showToast(id ? 'Updated!' : 'Created!');
         }
 
         function deleteCurrent() {
-            if(confirm("Delete this event?")) {
-                events = events.filter(x => x.id !== currentEditingId);
-                localStorage.setItem('myEvents', JSON.stringify(events));
-                closeModal('detailView');
-                renderList();
+            const editId = document.getElementById('editId').value;
+            const idToDelete = editId ? parseInt(editId) : currentId;
+
+            if (!idToDelete) {
+                showToast('No event to delete');
+                return;
+            }
+
+            if (!confirm('Delete this countdown?')) return;
+
+            countdowns = countdowns.filter(function(c) { return c.id !== idToDelete; });
+            saveCountdowns();
+            renderCountdowns();
+            closeModal();
+            closeDetail();
+            currentId = null;
+            showToast('Deleted!');
+        }
+
+        // ==================== DETAIL VIEW ====================
+        function openDetailView(id) {
+            const countdown = countdowns.find(function(c) { return c.id === id; });
+            if (!countdown) return;
+
+            currentId = id;
+
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            const eventDate = new Date(countdown.date);
+            eventDate.setHours(0, 0, 0, 0);
+            const diffDays = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+            const isPast = diffDays < 0;
+
+            const notifCard = document.getElementById('detailNotificationCard');
+            if (countdown.notification) {
+                notifCard.style.display = 'flex';
+                const label = getNotifLabel(countdown.notification.minutes);
+                document.getElementById('detailNotificationText').textContent = "You'll be notified " + label + ' before';
+            } else {
+                notifCard.style.display = 'none';
+            }
+
+            const iconEl = document.getElementById('detailIcon');
+            if (countdown.image) {
+                iconEl.innerHTML = '<img src="' + countdown.image + '" alt="' + countdown.name + '" onerror="this.parentNode.innerHTML=' + "'📅'" + '">';
+            } else {
+                iconEl.textContent = countdown.emoji || '📅';
+            }
+
+            // Handle detail icon background
+            const hasImageBg = (countdown.bgType === 'image' || countdown.bgType === 'url') && countdown.bgImage;
+            if (hasImageBg) {
+                iconEl.style.backgroundImage = 'url(' + countdown.bgImage + ')';
+                iconEl.style.backgroundSize = 'cover';
+                iconEl.style.backgroundPosition = 'center';
+            } else {
+                iconEl.style.background = countdown.color || '#FF6B9D';
+            }
+
+            // Apply background to detail card
+            const detailCard = document.getElementById('detailCard');
+            if (detailCard) {
+                if (hasImageBg) {
+                    // Use the image as background with dark overlay
+                    detailCard.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(' + countdown.bgImage + ')';
+                    detailCard.style.backgroundSize = 'cover';
+                    detailCard.style.backgroundPosition = 'center';
+                    detailCard.style.color = 'white';
+
+                    // Add text shadows for readability
+                    document.getElementById('detailTitle').style.textShadow = '0 2px 8px rgba(0,0,0,0.9)';
+                    document.getElementById('detailDate').style.textShadow = '0 1px 4px rgba(0,0,0,0.9)';
+                    document.getElementById('detailLabel').style.textShadow = '0 1px 4px rgba(0,0,0,0.9)';
+                    document.getElementById('detailDays').style.textShadow = '0 2px 8px rgba(0,0,0,0.9)';
+                    document.getElementById('liveCountdown').style.textShadow = '0 1px 4px rgba(0,0,0,0.9)';
+                } else {
+                    // Reset to default white background
+                    detailCard.style.backgroundImage = '';
+                    detailCard.style.background = 'white';
+                    detailCard.style.color = '';
+
+                    // Remove text shadows
+                    document.getElementById('detailTitle').style.textShadow = '';
+                    document.getElementById('detailDate').style.textShadow = '';
+                    document.getElementById('detailLabel').style.textShadow = '';
+                    document.getElementById('detailDays').style.textShadow = '';
+                    document.getElementById('liveCountdown').style.textShadow = '';
+                }
+            }
+
+            document.getElementById('detailTitle').textContent = countdown.name;
+
+            let dateTimeStr = new Date(countdown.date).toLocaleDateString(currentLang === 'en' ? 'en-US' : currentLang, { 
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+            });
+            if (countdown.time) {
+                dateTimeStr += ' at ' + countdown.time;
+            }
+            document.getElementById('detailDate').textContent = dateTimeStr;
+
+            // Add location to detail view if present
+            const existingLocation = document.getElementById('detailLocation');
+            if (existingLocation) {
+                existingLocation.remove();
+            }
+            if (countdown.location) {
+                const locationEl = document.createElement('div');
+                locationEl.id = 'detailLocation';
+                locationEl.style.cssText = 'color: var(--text-secondary); margin-top: 0.5rem; font-size: 1rem;';
+                locationEl.innerHTML = '📍 ' + escapeHtml(countdown.location);
+                document.getElementById('detailDate').after(locationEl);
+            }
+            document.getElementById('detailDays').textContent = Math.abs(diffDays);
+            document.getElementById('detailLabel').textContent = isPast ? t('daysAgo') : t('daysLeft');
+            document.getElementById('detailDays').style.color = isPast ? '#8E8E93' : (countdown.color || '#007AFF');
+
+            const liveEl = document.getElementById('liveCountdown');
+            if (diffDays >= 0) {
+                const diffMs = eventDate - now;
+                liveEl.textContent = formatLiveCountdown(diffMs);
+            } else {
+                liveEl.textContent = '00:00:00:00';
+            }
+
+            loadTodos();
+
+            document.getElementById('detailView').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailView').classList.remove('active');
+            document.body.style.overflow = '';
+            currentId = null;
+        }
+
+        function editCurrent() {
+            if (!currentId) return;
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown) return;
+
+            closeDetail();
+
+            document.getElementById('editId').value = countdown.id;
+            document.getElementById('eventName').value = countdown.name;
+            document.getElementById('eventDate').value = countdown.date;
+            document.getElementById('eventTime').value = countdown.time || '';
+            document.getElementById('eventLocation').value = countdown.location || '';
+            document.getElementById('selectedColor').value = countdown.color || '#FF6B9D';
+            document.getElementById('modalTitle').textContent = t('editCountdown');
+            document.getElementById('submitBtn').textContent = t('updateCountdown');
+            document.getElementById('deleteBtn').style.display = 'block';
+
+            // Handle icon
+            if (countdown.image) {
+                selectIconType('image');
+                document.getElementById('imageData').value = countdown.image;
+                document.getElementById('uploadPreview').src = countdown.image;
+                document.getElementById('imageUploadArea').classList.add('has-image');
+            } else {
+                selectIconType('emoji');
+                document.getElementById('selectedEmoji').value = countdown.emoji || '❤️';
+                document.querySelectorAll('.emoji-btn').forEach(function(b) {
+                    b.classList.toggle('selected', b.textContent === (countdown.emoji || '❤️'));
+                });
+            }
+
+            // Handle background
+            const bgType = countdown.bgType || 'color';
+            selectBgType(bgType);
+            document.getElementById('bgType').value = bgType;
+
+            if (bgType === 'color') {
+                // Check the color radio
+                const colorRadio = document.querySelector('input[name="color"][value="' + countdown.color + '"]');
+                if (colorRadio) {
+                    colorRadio.checked = true;
+                } else if (countdown.color) {
+                    // Set custom color
+                    const customRadio = document.getElementById('customColorRadio');
+                    if (customRadio) {
+                        customRadio.checked = true;
+                        const customCircle = document.querySelector('.custom-color .color-circle');
+                        if (customCircle) {
+                            customCircle.style.background = countdown.color;
+                        }
+                    }
+                }
+            } else if (bgType === 'image') {
+                if (countdown.bgImage) {
+                    document.getElementById('bgImageData').value = countdown.bgImage;
+                    document.getElementById('bgUploadPreview').src = countdown.bgImage;
+                    document.getElementById('bgImageUploadArea').classList.add('has-bg-image');
+                }
+            } else if (bgType === 'url') {
+                if (countdown.bgImage) {
+                    document.getElementById('bgImageUrl').value = countdown.bgImage;
+                    document.getElementById('bgImageData').value = countdown.bgImage;
+                    previewBgUrl();
+                }
+            }
+
+            if (countdown.notification) {
+                document.getElementById('notificationToggle').classList.add('active');
+                document.getElementById('notificationOptions').classList.add('show');
+                const radio = document.querySelector('input[name="notifyTime"][value="' + countdown.notification.minutes + '"]');
+                if (radio) radio.checked = true;
+            }
+
+            if (countdown.repeatYearly) {
+                document.getElementById('repeatToggle').classList.add('active');
+            }
+
+            document.getElementById('modalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function toggleDetailNotification() {
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown) return;
+
+            if (countdown.notification) {
+                delete countdown.notification;
+                showToast('Reminder turned off');
+            } else {
+                countdown.notification = { enabled: true, minutes: 60 };
+                showToast('Reminder set: 1 hour before');
+            }
+
+            saveCountdowns();
+            renderCountdowns();
+            openDetailView(currentId);
+        }
+
+        // ==================== TODO LIST ====================
+        function loadTodos() {
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown) return;
+
+            const todoList = document.getElementById('todoList');
+            const todos = countdown.todos || [];
+
+            if (todos.length === 0) {
+                todoList.innerHTML = '<div class="todo-empty" id="todoEmpty">' + t('todoEmpty') + '</div>';
+            } else {
+                todoList.innerHTML = todos.map(function(todo, index) {
+                    return '<div class="todo-item ' + (todo.completed ? 'completed' : '') + '">' +
+                        '<div class="todo-checkbox ' + (todo.completed ? 'checked' : '') + '" onclick="toggleTodo(' + index + ')">' + (todo.completed ? '✓' : '') + '</div>' +
+                        '<div class="todo-text">' + escapeHtml(todo.text) + '</div>' +
+                        '<button class="todo-delete" onclick="deleteTodo(' + index + ')">×</button>' +
+                    '</div>';
+                }).join('');
+            }
+
+            updateTodoCount();
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown) return;
+
+            if (!countdown.todos) countdown.todos = [];
+            countdown.todos.push({ text: text, completed: false });
+
+            saveCountdowns();
+            input.value = '';
+            loadTodos();
+        }
+
+        function toggleTodo(index) {
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown || !countdown.todos) return;
+
+            countdown.todos[index].completed = !countdown.todos[index].completed;
+            saveCountdowns();
+            loadTodos();
+        }
+
+        function deleteTodo(index) {
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown || !countdown.todos) return;
+
+            countdown.todos.splice(index, 1);
+            saveCountdowns();
+            loadTodos();
+        }
+
+        function updateTodoCount() {
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown) return;
+
+            const todos = countdown.todos || [];
+            const completed = todos.filter(function(t) { return t.completed; }).length;
+            document.getElementById('todoCount').textContent = completed + '/' + todos.length;
+        }
+
+        // ==================== CALENDAR INTEGRATION ====================
+        function addToCalendar(type) {
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown) return;
+
+            const title = encodeURIComponent(countdown.name);
+            const date = new Date(countdown.date);
+            const startDate = formatDateForCalendar(date);
+            const endDate = formatDateForCalendar(new Date(date.getTime() + 24 * 60 * 60 * 1000));
+            const details = encodeURIComponent('Countdown event from EventList');
+
+            let url = '';
+
+            switch(type) {
+                case 'google':
+                    url = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + startDate + '/' + endDate + '&details=' + details;
+                    break;
+                case 'outlook':
+                    url = 'https://outlook.live.com/calendar/0/deeplink/compose?subject=' + title + '&startdt=' + formatDateISO(date) + '&enddt=' + formatDateISO(new Date(date.getTime() + 24 * 60 * 60 * 1000)) + '&body=' + details;
+                    break;
+                case 'ical':
+                    generateICSFile(countdown);
+                    return;
+            }
+
+            if (url) window.open(url, '_blank');
+        }
+
+        function formatDateForCalendar(date) {
+            return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        }
+
+        function formatDateISO(date) {
+            return date.toISOString();
+        }
+
+        function generateICSFile(countdown) {
+            const date = new Date(countdown.date);
+            const startDate = formatDateForCalendar(date);
+            const endDate = formatDateForCalendar(new Date(date.getTime() + 24 * 60 * 60 * 1000));
+
+            const icsContent = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'BEGIN:VEVENT',
+                'SUMMARY:' + countdown.name,
+                'DTSTART:' + startDate,
+                'DTEND:' + endDate,
+                'DESCRIPTION:Countdown event from EventList',
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\n');
+
+            const blob = new Blob([icsContent], {type: 'text/calendar'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = countdown.name.replace(/\s+/g, '_') + '.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('iCal file downloaded!');
+        }
+
+        // ==================== BACKGROUND IMAGE ====================
+        function updateBackgroundPreview() {
+            const url = document.getElementById('bgUrlInput').value.trim();
+            const preview = document.getElementById('bgPreview');
+            const clearBtn = document.getElementById('bgClearBtn');
+
+            if (url) {
+                preview.style.backgroundImage = 'url(' + url + ')';
+                preview.classList.add('show');
+                clearBtn.style.display = 'inline-block';
+            } else {
+                preview.classList.remove('show');
+                clearBtn.style.display = 'none';
             }
         }
 
-        function applyGlobalBg() {
-            const url = document.getElementById('bgInput').value;
-            if(url) {
-                document.body.style.backgroundImage = `url(${url})`;
-                localStorage.setItem('globalBg', url);
-                showToast("Background Updated");
+        function saveBackgroundUrl() {
+            const url = document.getElementById('bgUrlInput').value.trim();
+            if (url) {
+                backgroundUrl = url;
+                localStorage.setItem('eventlist-bg-url', url);
+                applyBackground();
+                showToast('Background applied!');
             }
+        }
+
+        function clearBackground() {
+            backgroundUrl = '';
+            localStorage.removeItem('eventlist-bg-url');
+            document.getElementById('bgUrlInput').value = '';
+            document.getElementById('bgPreview').classList.remove('show');
+            document.getElementById('bgClearBtn').style.display = 'none';
+            document.body.classList.remove('has-bg-image');
+            document.body.style.backgroundImage = '';
+            showToast('Background cleared!');
+        }
+
+        function applyBackground() {
+            if (backgroundUrl) {
+                document.body.style.backgroundImage = 'url(' + backgroundUrl + ')';
+                document.body.classList.add('has-bg-image');
+            }
+        }
+
+        // ==================== SETTINGS ====================
+        function openSettings() {
+            document.getElementById('settingsOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeSettingsOnOverlay(e) {
+            if (e.target === e.currentTarget) closeSettings();
         }
 
         function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(events));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "events_backup.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+            if (countdowns.length === 0) {
+                showToast('No events to export');
+                return;
+            }
+
+            var data = {
+                version: 2,
+                appName: 'EventList',
+                exportedAt: new Date().toISOString(),
+                countdowns: countdowns,
+                settings: {
+                    language: currentLang,
+                    backgroundUrl: backgroundUrl,
+                    autoSave: autoSaveEnabled
+                }
+            };
+
+            var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'eventlist-backup-' + new Date().toISOString().split('T')[0] + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('Exported ' + countdowns.length + ' events!');
+            closeSettings();
         }
 
-        function importData(input) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imported = JSON.parse(e.target.result);
-                events = imported;
-                localStorage.setItem('myEvents', JSON.stringify(events));
-                renderList();
-                showToast("Data Imported!");
+        function importData() {
+            document.getElementById('importFileInput').click();
+        }
+
+        function handleImportFile(input) {
+            var file = input.files[0];
+            if (!file) return;
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    var data = JSON.parse(e.target.result);
+                    if (!data.countdowns || !Array.isArray(data.countdowns)) {
+                        throw new Error('Invalid format');
+                    }
+
+                    var count = data.countdowns.length;
+                    if (count === 0) {
+                        showToast('No events found');
+                        return;
+                    }
+
+                    if (countdowns.length > 0) {
+                        if (!confirm('Replace ' + countdowns.length + ' events with ' + count + ' from file?')) {
+                            input.value = '';
+                            return;
+                        }
+                    }
+
+                    countdowns = data.countdowns;
+
+                    if (data.settings) {
+                        if (data.settings.language) {
+                            changeLanguage(data.settings.language);
+                        }
+                        if (data.settings.backgroundUrl) {
+                            backgroundUrl = data.settings.backgroundUrl;
+                            localStorage.setItem('eventlist-bg-url', backgroundUrl);
+                            document.getElementById('bgUrlInput').value = backgroundUrl;
+                            updateBackgroundPreview();
+                            applyBackground();
+                        }
+                    }
+
+                    saveCountdowns();
+                    renderCountdowns();
+                    showToast('Imported ' + count + ' events!');
+                    closeSettings();
+
+                } catch (err) {
+                    showToast('Error: Invalid file');
+                }
+                input.value = '';
             };
             reader.readAsText(file);
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2500);
+        function toggleAutoSave() {
+            autoSaveEnabled = !autoSaveEnabled;
+            localStorage.setItem('eventlist-autosave', autoSaveEnabled);
+            document.getElementById('autoSaveToggle').classList.toggle('active', autoSaveEnabled);
+            showToast(autoSaveEnabled ? 'Auto-save ON' : 'Auto-save OFF');
         }
 
-        // Initialize App
-        window.onload = () => {
-            const savedBg = localStorage.getItem('globalBg');
-            if(savedBg) {
-                document.body.style.backgroundImage = `url(${savedBg})`;
-                document.getElementById('bgInput').value = savedBg;
+        // ==================== STORAGE ====================
+        function saveCountdowns() {
+            localStorage.setItem('countdowns', JSON.stringify(countdowns));
+
+            if (autoSaveEnabled && countdowns.length > 0) {
+                var data = {version: 2, appName: 'EventList', savedAt: new Date().toISOString(), countdowns: countdowns};
+                var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'eventlist-auto-' + new Date().toISOString().split('T')[0] + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             }
-            renderList();
-        };
+        }
+
+        // ==================== SHARE FUNCTION ====================
+        function shareEvent(method) {
+            const countdown = countdowns.find(function(c) { return c.id === currentId; });
+            if (!countdown) return;
+
+            // Build different messages for different platforms
+            const messages = buildShareMessages(countdown);
+
+            // Handle different share methods
+            switch(method) {
+                case 'whatsapp':
+                    const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent(messages.whatsapp);
+                    window.open(whatsappUrl, '_blank');
+                    break;
+
+                case 'instagram':
+                    // Instagram doesn't have a direct text share URL, so we copy to clipboard
+                    copyToClipboard(messages.instagram);
+                    showToast('Caption copied! Open Instagram to paste');
+                    setTimeout(function() {
+                        window.open('https://instagram.com', '_blank');
+                    }, 1500);
+                    break;
+
+                case 'facebook':
+                    // Facebook share dialog
+                    const fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href) + 
+                                 '&quote=' + encodeURIComponent(messages.facebook);
+                    window.open(fbUrl, '_blank', 'width=600,height=400');
+                    break;
+
+                case 'twitter':
+                case 'x':
+                    const twitterUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(messages.twitter);
+                    window.open(twitterUrl, '_blank');
+                    break;
+
+                case 'native':
+                    if (navigator.share) {
+                        navigator.share({
+                            title: countdown.name,
+                            text: messages.plain,
+                        }).catch(function(err) {
+                            copyToClipboard(messages.plain);
+                        });
+                    } else {
+                        copyToClipboard(messages.plain);
+                    }
+                    break;
+
+                case 'copy':
+                default:
+                    copyToClipboard(messages.plain);
+                    break;
+            }
+        }
+
+        function buildShareMessages(countdown) {
+            const dateStr = new Date(countdown.date).toLocaleDateString(currentLang === 'en' ? 'en-US' : currentLang, { 
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+            });
+
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            const eventDate = new Date(countdown.date);
+            eventDate.setHours(0, 0, 0, 0);
+            const diffDays = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+
+            const hashtag = countdown.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const hashtagStr = hashtag ? '#' + hashtag : '';
+
+            // WhatsApp message (formatted with emojis)
+            let whatsapp = '📅 *' + countdown.name + '*\n\n';
+            whatsapp += '🗓️ ' + dateStr;
+            if (countdown.time) whatsapp += ' at ' + countdown.time;
+            whatsapp += '\n';
+            if (countdown.location) whatsapp += '📍 ' + countdown.location + '\n';
+            if (diffDays > 0) whatsapp += '\n⏰ ' + diffDays + ' days left!';
+            else if (diffDays === 0) whatsapp += '\n🎉 Today!';
+            if (hashtagStr) whatsapp += '\n\n' + hashtagStr;
+
+            // Instagram caption (hashtag heavy)
+            let instagram = countdown.name + '\n\n';
+            instagram += '📅 ' + dateStr;
+            if (countdown.time) instagram += ' \u2022 ' + countdown.time;
+            instagram += '\n';
+            if (countdown.location) instagram += '📍 ' + countdown.location + '\n';
+            if (diffDays > 0) instagram += '\n' + diffDays + ' days to go ✨';
+            instagram += '\n\n.';
+            instagram += '\n.';
+            instagram += '\n.';
+            instagram += '\n#event #countdown #calendar';
+            if (hashtagStr) instagram += ' ' + hashtagStr;
+            instagram += ' #eventlist #reminder';
+
+            // Facebook message
+            let facebook = '🎉 ' + countdown.name + '\n\n';
+            facebook += '📅 Date: ' + dateStr;
+            if (countdown.time) facebook += '\n🕐 Time: ' + countdown.time;
+            if (countdown.location) facebook += '\n📍 Location: ' + countdown.location;
+            if (diffDays > 0) facebook += '\n\n⏰ ' + diffDays + ' days remaining!';
+            if (hashtagStr) facebook += '\n\n' + hashtagStr;
+
+            // Twitter/X message (short)
+            let twitter = '📅 ' + countdown.name;
+            twitter += '\n' + dateStr;
+            if (diffDays > 0) twitter += '\n⏰ ' + diffDays + ' days left';
+            if (hashtagStr) twitter += '\n' + hashtagStr;
+
+            // Plain text (generic)
+            let plain = countdown.name + '\n';
+            plain += dateStr;
+            if (countdown.time) plain += ' at ' + countdown.time;
+            if (countdown.location) plain += '\n📍 ' + countdown.location;
+            if (diffDays > 0) plain += '\n' + diffDays + ' days left!';
+            if (hashtagStr) plain += '\n' + hashtagStr;
+
+            return {
+                whatsapp: whatsapp,
+                instagram: instagram,
+                facebook: facebook,
+                twitter: twitter,
+                plain: plain
+            };
+        }
+
+        function copyToClipboard(text) {
+            // Create temporary textarea
+            const textarea = document.createElement('textarea');
+            textarea.value = text.replace(/\n/g, '\n');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                document.execCommand('copy');
+                showToast('Copied to clipboard!');
+            } catch (err) {
+                showToast('Failed to copy');
+            }
+
+            document.body.removeChild(textarea);
+        }
+
+        // ==================== UTILITIES ====================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 2500);
+        }
     </script>
 </body>
 </html>
